@@ -543,6 +543,92 @@ class AppStoreServerAPIClientTest extends TestCase
         self::fail("Expected client to throw APIException.");
     }
 
+    /**
+     * @throws APIException
+     */
+    public function testGetTransactionHistoryWithMalformedEnvironment(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/transactionHistoryResponseWithMalformedEnvironment.json",
+            expectedMethod: "GET",
+            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/history/1234",
+            expectedParams: [
+                "revision" => ["revision_input"],
+                "startDate" => ["123455"],
+                "endDate" => ["123456"],
+                "productId" => ["com.example.1", "com.example.2"],
+                "productType" => ["CONSUMABLE", "AUTO_RENEWABLE"],
+                "sort" => ["ASCENDING"],
+                "subscriptionGroupIdentifier" => ["sub_group_id", "sub_group_id_2"],
+                "inAppOwnershipType" => ["FAMILY_SHARED"],
+                "revoked" => ["false"]
+            ],
+            expectedJson: null
+        );
+
+        $transactionHistoryRequest = new TransactionHistoryRequest(
+            startDate: 123455,
+            endDate: 123456,
+            productIds: ["com.example.1", "com.example.2"],
+            productTypes: [ProductType::CONSUMABLE, ProductType::AUTO_RENEWABLE],
+            sort: Order::ASCENDING,
+            subscriptionGroupIdentifiers: ["sub_group_id", "sub_group_id_2"],
+            inAppOwnershipType: InAppOwnershipType::FAMILY_SHARED,
+            revoked: false
+        );
+
+        $transactionHistoryResponse = $client->getTransactionHistory(
+            transactionId: "1234",
+            revision: "revision_input",
+            transactionHistoryRequest: $transactionHistoryRequest
+        );
+
+        self::assertNull($transactionHistoryResponse->getEnvironment());
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testGetTransactionHistoryWithMalformedAppAppleId(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/transactionHistoryResponseWithMalformedAppAppleId.json",
+            expectedMethod: "GET",
+            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/history/1234",
+            expectedParams: [
+                "revision" => ["revision_input"],
+                "startDate" => ["123455"],
+                "endDate" => ["123456"],
+                "productId" => ["com.example.1", "com.example.2"],
+                "productType" => ["CONSUMABLE", "AUTO_RENEWABLE"],
+                "sort" => ["ASCENDING"],
+                "subscriptionGroupIdentifier" => ["sub_group_id", "sub_group_id_2"],
+                "inAppOwnershipType" => ["FAMILY_SHARED"],
+                "revoked" => ["false"]
+            ],
+            expectedJson: null
+        );
+
+        $transactionHistoryRequest = new TransactionHistoryRequest(
+            startDate: 123455,
+            endDate: 123456,
+            productIds: ["com.example.1", "com.example.2"],
+            productTypes: [ProductType::CONSUMABLE, ProductType::AUTO_RENEWABLE],
+            sort: Order::ASCENDING,
+            subscriptionGroupIdentifiers: ["sub_group_id", "sub_group_id_2"],
+            inAppOwnershipType: InAppOwnershipType::FAMILY_SHARED,
+            revoked: false
+        );
+
+        $transactionHistoryResponse = $client->getTransactionHistory(
+            transactionId: "1234",
+            revision: "revision_input",
+            transactionHistoryRequest: $transactionHistoryRequest
+        );
+
+        self::assertNull($transactionHistoryResponse->getAppAppleId());
+    }
+
     private function getClientWithBody(
         string $body,
         string $expectedMethod,
