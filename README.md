@@ -9,17 +9,11 @@ Also available in
 [Java](https://github.com/apple/app-store-server-library-java).
 
 ## Table of Contents
-1. [Beta](#-beta-)
-2. [Author](#author)
-3. [Installation](#installation)
-4. [Documentation](#documentation)
-5. [Usage](#usage)
-6. [Support](#support)
-
-## ⚠️ Beta ⚠️
-
-This software is currently in Beta testing. Therefore, it should only be used for testing purposes, like for the Sandbox
-environment. API signatures may change between releases and signature verification may receive security updates. 
+1. [Author](#author)
+2. [Installation](#installation)
+3. [Documentation](#documentation)
+4. [Usage](#usage)
+5. [Support](#support)
 
 ## Author
 
