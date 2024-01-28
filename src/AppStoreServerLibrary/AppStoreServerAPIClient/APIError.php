@@ -217,7 +217,7 @@ enum APIError: int
     case INVALID_CONSUMPTION_STATUS = 4000034;
 
     /**
-     * An error that indicates the customer consented field is invalid or doesn’t indicate that the customer consented.
+     * An error that indicates the customer consented field is invalid or doesn't indicate that the customer consented.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/invalidcustomerconsentederror
      */
@@ -273,56 +273,59 @@ enum APIError: int
     case INVALID_USER_STATUS = 4000042;
 
     /**
-     * An error that indicates the transaction identifier doesn’t represent a consumable in-app purchase.
+     * An error that indicates the transaction identifier doesn't represent a consumable in-app purchase.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/invalidtransactionnotconsumableerror
      */
     case INVALID_TRANSACTION_NOT_CONSUMABLE = 4000043;
 
     /**
-     * An error that indicates the subscription doesn't qualify for a renewal-date extension due to its subscription state.
+     * An error that indicates the subscription doesn't qualify for a renewal-date extension due to its subscription
+     * state.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/subscriptionextensionineligibleerror
      */
     case SUBSCRIPTION_EXTENSION_INELIGIBLE = 4030004;
 
     /**
-     * An error that indicates the subscription doesn’t qualify for a renewal-date extension because it has already received the maximum extensions.
+     * An error that indicates the subscription doesn't qualify for a renewal-date extension because it has already
+     * received the maximum extensions.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/subscriptionmaxextensionerror
      */
     case SUBSCRIPTION_MAX_EXTENSION = 4030005;
 
     /**
-     * An error that indicates a subscription isn't directly eligible for a renewal date extension because the user obtained it through Family Sharing.
+     * An error that indicates a subscription isn't directly eligible for a renewal date extension because the user
+     * obtained it through Family Sharing.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/familysharedsubscriptionextensionineligibleerror
      */
     case FAMILY_SHARED_SUBSCRIPTION_EXTENSION_INELIGIBLE = 4030007;
 
     /**
-     * An error that indicates the App Store account wasn’t found.
+     * An error that indicates the App Store account wasn't found.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/accountnotfounderror
      */
     case ACCOUNT_NOT_FOUND = 4040001;
 
     /**
-     * An error response that indicates the App Store account wasn’t found, but you can try again.
+     * An error response that indicates the App Store account wasn't found, but you can try again.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/accountnotfoundretryableerror
      */
     case ACCOUNT_NOT_FOUND_RETRYABLE = 4040002;
 
     /**
-     * An error that indicates the app wasn’t found.
+     * An error that indicates the app wasn't found.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/appnotfounderror
      */
     case APP_NOT_FOUND = 4040003;
 
     /**
-     * An error response that indicates the app wasn’t found, but you can try again.
+     * An error response that indicates the app wasn't found, but you can try again.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/appnotfoundretryableerror
      */
@@ -336,28 +339,31 @@ enum APIError: int
     case ORIGINAL_TRANSACTION_ID_NOT_FOUND = 4040005;
 
     /**
-     * An error response that indicates the original transaction identifier wasn’t found, but you can try again.
+     * An error response that indicates the original transaction identifier wasn't found, but you can try again.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/originaltransactionidnotfoundretryableerror
      */
     case ORIGINAL_TRANSACTION_ID_NOT_FOUND_RETRYABLE = 4040006;
 
     /**
-     * An error that indicates that the App Store server couldn’t find a notifications URL for your app in this environment.
+     * An error that indicates that the App Store server couldn't find a notifications URL for your app in this
+     * environment.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/servernotificationurlnotfounderror
      */
     case SERVER_NOTIFICATION_URL_NOT_FOUND = 4040007;
 
     /**
-     * An error that indicates that the test notification token is expired or the test notification status isn’t available.
+     * An error that indicates that the test notification token is expired or the test notification status isn't
+     * available.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/testnotificationnotfounderror
      */
     case TEST_NOTIFICATION_NOT_FOUND = 4040008;
 
     /**
-     * An error that indicates the server didn't find a subscription-renewal-date extension request for the request identifier and product identifier you provided.
+     * An error that indicates the server didn't find a subscription-renewal-date extension request for the request
+     * identifier and product identifier you provided.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/statusrequestnotfounderror
      */
