@@ -493,6 +493,7 @@ class AppStoreServerAPIClientTest extends TestCase
         } catch (APIException $e) {
             self::assertEquals(500, $e->getHttpStatusCode());
             self::assertEquals(APIError::GENERAL_INTERNAL, $e->getApiError());
+            self::assertEquals("An unknown error occurred.", $e->getErrorMessage());
             return;
         }
 
@@ -515,6 +516,7 @@ class AppStoreServerAPIClientTest extends TestCase
         } catch (APIException $e) {
             self::assertEquals(429, $e->getHttpStatusCode());
             self::assertEquals(APIError::RATE_LIMIT_EXCEEDED, $e->getApiError());
+            self::assertEquals("Rate limit exceeded.", $e->getErrorMessage());
             return;
         }
 
@@ -537,6 +539,7 @@ class AppStoreServerAPIClientTest extends TestCase
         } catch (APIException $e) {
             self::assertEquals(400, $e->getHttpStatusCode());
             self::assertNull($e->getApiError());
+            self::assertEquals("Testing error.", $e->getErrorMessage());
             return;
         }
 

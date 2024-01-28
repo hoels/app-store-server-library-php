@@ -21,7 +21,6 @@ use AppStoreServerLibrary\Models\Status;
 use AppStoreServerLibrary\Models\StatusResponse;
 use AppStoreServerLibrary\Models\TransactionHistoryRequest;
 use AppStoreServerLibrary\Models\TransactionInfoResponse;
-use DateTime;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -123,9 +122,12 @@ class AppStoreServerAPIClient
             $responseBody = json_decode((string)$response->getBody(), true);
             $responseBody = is_array($responseBody) ? $responseBody : [];
             $rawApiError = is_int($responseBody["errorCode"] ?? null) ? $responseBody["errorCode"] : null;
+            $errorMessage = is_string($responseBody["errorMessage"] ?? null)
+                ? $responseBody["errorMessage"] : null;
             throw new APIException(
                 httpStatusCode: $response->getStatusCode(),
-                rawApiError: $rawApiError
+                rawApiError: $rawApiError,
+                errorMessage: $errorMessage
             );
         }
     }
