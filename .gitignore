@@ -1,6 +1,7 @@
 .idea/
 .DS_Store
 /vendor/
+composer.lock
 
 ###> phpunit/phpunit ###
 /phpunit.xml
