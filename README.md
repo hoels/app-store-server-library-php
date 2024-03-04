@@ -86,11 +86,13 @@ $rootCertificates = load_root_certificates(); // Implementation will vary
 $enableOnlineChecks = true;
 $bundleId = "com.example";
 $environment = Environment::SANDBOX;
+$appAppleId = null; // appAppleId must be provided for the Production environment
 $signedDataVerifier = new SignedDataVerifier(
     rootCertificates: $rootCertificates,
     enableOnlineChecks: $enableOnlineChecks,
     environment: $environment,
-    bundleId: $bundleId
+    bundleId: $bundleId,
+    appAppleId: $appAppleId
 );
 
 try {

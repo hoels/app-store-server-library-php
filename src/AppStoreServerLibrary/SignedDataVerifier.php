@@ -10,6 +10,7 @@ use AppStoreServerLibrary\Models\ResponseBodyV2DecodedPayload;
 use AppStoreServerLibrary\SignedDataVerifier\VerificationException;
 use AppStoreServerLibrary\SignedDataVerifier\VerificationStatus;
 use stdClass;
+use ValueError;
 
 class SignedDataVerifier
 {
@@ -18,7 +19,7 @@ class SignedDataVerifier
 
     /**
      * @param string[] $rootCertificates
-     * @throws VerificationException
+     * @throws VerificationException|ValueError
      */
     public function __construct(
         private readonly array $rootCertificates,
@@ -28,6 +29,9 @@ class SignedDataVerifier
         private readonly ?int $appAppleId = null,
     ) {
         $this->chainVerifier = new ChainVerifier($this->rootCertificates);
+        if ($environment === Environment::PRODUCTION && $this->appAppleId === null) {
+            throw new ValueError("appAppleId is required when the environment is Production");
+        }
     }
 
     /**
