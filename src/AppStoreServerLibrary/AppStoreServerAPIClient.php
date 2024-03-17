@@ -29,7 +29,7 @@ use JsonSerializable;
 
 class AppStoreServerAPIClient
 {
-    const USER_AGENT = "app-store-server-library/php/1.0.0";
+    const USER_AGENT = "app-store-server-library/php/1.1.0";
     const PRODUCTION_URL = "https://api.storekit.itunes.apple.com";
     const SANDBOX_URL = "https://api.storekit-sandbox.itunes.apple.com";
     const APP_STORE_CONNECT_AUDIENCE = "appstoreconnect-v1";
