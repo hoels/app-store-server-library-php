@@ -692,7 +692,7 @@ class AppStoreServerAPIClientTest extends TestCase
                     return true;
                 })
             )
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $signingKey = file_get_contents(__DIR__ . "/resources/certs/testSigningKey.p8");
         self::assertNotFalse($signingKey);

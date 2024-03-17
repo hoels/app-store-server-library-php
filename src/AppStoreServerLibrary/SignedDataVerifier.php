@@ -85,15 +85,34 @@ class SignedDataVerifier
         $bundleId = null;
         $appAppleId = null;
         $environment = null;
-        if ($decodedSignedNotification->getData() !== null) {
-            $bundleId = $decodedSignedNotification->getData()->getBundleId();
-            $appAppleId = $decodedSignedNotification->getData()->getAppAppleId();
-            $environment = $decodedSignedNotification->getData()->getEnvironment();
-        } elseif ($decodedSignedNotification->getSummary() !== null) {
-            $bundleId = $decodedSignedNotification->getSummary()->getBundleId();
-            $appAppleId = $decodedSignedNotification->getSummary()->getAppAppleId();
-            $environment = $decodedSignedNotification->getSummary()->getEnvironment();
+        if (($data = $decodedSignedNotification->getData()) !== null) {
+            $bundleId = $data->getBundleId();
+            $appAppleId = $data->getAppAppleId();
+            $environment = $data->getEnvironment();
+        } elseif (($summary = $decodedSignedNotification->getSummary()) !== null) {
+            $bundleId = $summary->getBundleId();
+            $appAppleId = $summary->getAppAppleId();
+            $environment = $summary->getEnvironment();
+        } elseif (($externalPurchaseToken = $decodedSignedNotification->getExternalPurchaseToken()) !== null) {
+            $bundleId = $externalPurchaseToken->getBundleId();
+            $appAppleId = $externalPurchaseToken->getAppAppleId();
+            if (($externalPurchaseId = $externalPurchaseToken->getExternalPurchaseId()) !== null
+                && str_starts_with($externalPurchaseId, "SANDBOX")) {
+                $environment = Environment::SANDBOX;
+            } else {
+                $environment = Environment::PRODUCTION;
+            }
         }
+
+        $this->verifyNotification(bundleId: $bundleId, appAppleId: $appAppleId, environment: $environment);
+
+        return $decodedSignedNotification;
+    }
+
+    /**
+     * @throws VerificationException
+     */
+    public function verifyNotification(?string $bundleId, ?int $appAppleId, ?Environment $environment): void {
         if ($bundleId !== $this->bundleId
             || ($this->environment === Environment::PRODUCTION
                 && $appAppleId !== $this->appAppleId)
@@ -103,7 +122,6 @@ class SignedDataVerifier
         if ($environment !== $this->environment) {
             throw new VerificationException(VerificationStatus::INVALID_ENVIRONMENT);
         }
-        return $decodedSignedNotification;
     }
 
     /**

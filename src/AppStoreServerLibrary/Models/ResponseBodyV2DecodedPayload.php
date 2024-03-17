@@ -16,6 +16,7 @@ class ResponseBodyV2DecodedPayload
         private readonly ?Subtype $subtype,
         private readonly ?Data $data,
         private readonly ?Summary $summary,
+        private readonly ?ExternalPurchaseToken $externalPurchaseToken,
         private readonly ?string $version,
         private readonly ?int $signedDate,
         private readonly ?string $notificationUUID,
@@ -45,7 +46,8 @@ class ResponseBodyV2DecodedPayload
 
     /**
      * The object that contains the app metadata and signed renewal and transaction information.
-     * The data and summary fields are mutually exclusive. The payload contains one of the fields, but not both.
+     * The data, summary, and externalPurchaseToken fields are mutually exclusive. The payload contains only one of
+     * these fields.
      *
      * https://developer.apple.com/documentation/appstoreservernotifications/data
      */
@@ -57,13 +59,26 @@ class ResponseBodyV2DecodedPayload
     /**
      * The summary data that appears when the App Store server completes your request to extend a subscription renewal
      * date for eligible subscribers.
-     * The data and summary fields are mutually exclusive. The payload contains one of the fields, but not both.
+     * The data, summary, and externalPurchaseToken fields are mutually exclusive. The payload contains only one of
+     * these fields.
      *
      * https://developer.apple.com/documentation/appstoreservernotifications/summary
      */
     public function getSummary(): ?Summary
     {
         return $this->summary;
+    }
+
+    /**
+     * This field appears when the notificationType is EXTERNAL_PURCHASE_TOKEN.
+     * The data, summary, and externalPurchaseToken fields are mutually exclusive. The payload contains only one of
+     * these fields.
+     *
+     * https://developer.apple.com/documentation/appstoreservernotifications/externalpurchasetoken
+     */
+    public function getExternalPurchaseToken(): ?ExternalPurchaseToken
+    {
+        return $this->externalPurchaseToken;
     }
 
     /**
@@ -107,6 +122,9 @@ class ResponseBodyV2DecodedPayload
                 ? Data::fromObject((object)$obj->data) : null,
             summary: property_exists($obj, "summary") && ($obj->summary instanceof stdClass || is_array($obj->summary))
                 ? Summary::fromObject((object)$obj->summary) : null,
+            externalPurchaseToken: property_exists($obj, "externalPurchaseToken")
+                && ($obj->externalPurchaseToken instanceof stdClass || is_array($obj->externalPurchaseToken))
+                ? ExternalPurchaseToken::fromObject((object)$obj->externalPurchaseToken) : null,
             version: property_exists($obj, "version") && is_string($obj->version)
                 ? $obj->version : null,
             signedDate: property_exists($obj, "signedDate")

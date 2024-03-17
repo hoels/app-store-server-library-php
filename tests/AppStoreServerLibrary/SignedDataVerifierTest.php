@@ -19,7 +19,9 @@ use AppStoreServerLibrary\SignedDataVerifier;
 use AppStoreServerLibrary\SignedDataVerifier\VerificationException;
 use AppStoreServerLibrary\SignedDataVerifier\VerificationStatus;
 use Firebase\JWT\JWT;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
+use ValueError;
 
 class SignedDataVerifierTest extends TestCase
 {
@@ -134,6 +136,7 @@ class SignedDataVerifierTest extends TestCase
         self::assertEquals(1698148900000, $notification->getSignedDate());
         self::assertNotNull($notification->getData());
         self::assertNull($notification->getSummary());
+        self::assertNull($notification->getExternalPurchaseToken());
         self::assertEquals(Environment::LOCAL_TESTING, $notification->getData()->getEnvironment());
         self::assertEquals(41234, $notification->getData()->getAppAppleId());
         self::assertEquals("com.example", $notification->getData()->getBundleId());
@@ -161,6 +164,7 @@ class SignedDataVerifierTest extends TestCase
         self::assertEquals(1698148900000, $notification->getSignedDate());
         self::assertNull($notification->getData());
         self::assertNotNull($notification->getSummary());
+        self::assertNull($notification->getExternalPurchaseToken());
         self::assertEquals(Environment::LOCAL_TESTING, $notification->getSummary()->getEnvironment());
         self::assertEquals(41234, $notification->getSummary()->getAppAppleId());
         self::assertEquals("com.example", $notification->getSummary()->getBundleId());
@@ -169,6 +173,47 @@ class SignedDataVerifierTest extends TestCase
         self::assertEquals(["CAN", "USA", "MEX"], $notification->getSummary()->getStorefrontCountryCodes());
         self::assertEquals(5, $notification->getSummary()->getSucceededCount());
         self::assertEquals(2, $notification->getSummary()->getFailedCount());
+    }
+
+    /**
+     * @throws Exception|VerificationException
+     */
+    public function testSelfSignedExternalPurchaseTokenNotificationDecoding(): void
+    {
+        $signedSummaryNotification = $this->createSignedDataFromJson(
+            path: __DIR__ . "/resources/models/signedExternalPurchaseTokenNotification.json"
+        );
+        $signedDataVerifierMock = $this->getMockedSignedDataVerifier(environment: Environment::PRODUCTION);
+
+        $notification = $signedDataVerifierMock->verifyAndDecodeNotification($signedSummaryNotification);
+        self::assertEquals(NotificationTypeV2::EXTERNAL_PURCHASE_TOKEN, $notification->getNotificationType());
+        self::assertEquals(Subtype::UNREPORTED, $notification->getSubtype());
+        self::assertEquals("002e14d5-51f5-4503-b5a8-c3a1af68eb20", $notification->getNotificationUUID());
+        self::assertEquals("2.0", $notification->getVersion());
+        self::assertEquals(1698148900000, $notification->getSignedDate());
+        self::assertNull($notification->getData());
+        self::assertNull($notification->getSummary());
+        self::assertNotNull($notification->getExternalPurchaseToken());
+        self::assertEquals(
+            "b2158121-7af9-49d4-9561-1f588205523e",
+            $notification->getExternalPurchaseToken()->getExternalPurchaseId()
+        );
+        self::assertEquals(1698148950000, $notification->getExternalPurchaseToken()->getTokenCreationDate());
+        self::assertEquals(55555, $notification->getExternalPurchaseToken()->getAppAppleId());
+        self::assertEquals("com.example", $notification->getExternalPurchaseToken()->getBundleId());
+    }
+
+    /**
+     * @throws Exception|VerificationException
+     */
+    public function testSelfSignedExternalPurchaseTokenSandboxNotificationDecoding(): void
+    {
+        $signedSummaryNotification = $this->createSignedDataFromJson(
+            path: __DIR__ . "/resources/models/signedExternalPurchaseTokenSandboxNotification.json"
+        );
+        $signedDataVerifierMock = $this->getMockedSignedDataVerifier(environment: Environment::SANDBOX);
+
+        $signedDataVerifierMock->verifyAndDecodeNotification($signedSummaryNotification);
     }
 
     /**
@@ -414,7 +459,7 @@ class SignedDataVerifierTest extends TestCase
     }
 
     /**
-     * @throws VerificationException
+     * @throws VerificationException|ValueError
      */
     private function getSignedDataVerifier(
         Environment $environment,
@@ -431,10 +476,39 @@ class SignedDataVerifierTest extends TestCase
     }
 
     /**
-     * @throws VerificationException
+     * @throws VerificationException|ValueError
      */
     private function getDefaultSignedDataVerifier(): SignedDataVerifier
     {
         return $this->getSignedDataVerifier(environment: Environment::LOCAL_TESTING, bundleId: "com.example");
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function getMockedSignedDataVerifier(
+        Environment $environment
+    ): SignedDataVerifier {
+        $signedDataVerifierMock = $this->getMockBuilder(SignedDataVerifier::class)
+            ->setConstructorArgs([
+                [file_get_contents(__DIR__ . "/resources/certs/testCA.der")], // rootCertificates
+                false, // enableOnlineChecks
+                Environment::LOCAL_TESTING, // environment
+                "com.example", // bundleId
+                55555 // appAppleId
+            ])
+            ->disableOriginalClone()
+            ->onlyMethods(["verifyNotification"])
+            ->getMock();
+        $signedDataVerifierMock
+            ->expects($this->once())
+            ->method("verifyNotification")
+            ->with(
+                "com.example", // bundleId
+                55555, // appAppleId
+                $environment // environment
+            );
+
+        return $signedDataVerifierMock;
     }
 }

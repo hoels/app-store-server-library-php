@@ -23,6 +23,7 @@ enum Subtype: string
     case PRODUCT_NOT_FOR_SALE = "PRODUCT_NOT_FOR_SALE";
     case RESUBSCRIBE = "RESUBSCRIBE";
     case SUMMARY = "SUMMARY";
+    case UNREPORTED = "UNREPORTED";
     case UPGRADE = "UPGRADE";
     case VOLUNTARY = "VOLUNTARY";
 }
