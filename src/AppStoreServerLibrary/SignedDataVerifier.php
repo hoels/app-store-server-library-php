@@ -37,6 +37,7 @@ class SignedDataVerifier
     /**
      * Verifies and decodes a signedRenewalInfo obtained from the App Store Server API, an App Store Server
      * Notification, or from a device
+     * See https://developer.apple.com/documentation/appstoreserverapi/jwsrenewalinfo
      *
      * @param string $signedRenewalInfo The signedRenewalInfo field
      * @return JWSRenewalInfoDecodedPayload The decoded renewal info after verification
@@ -54,6 +55,7 @@ class SignedDataVerifier
     /**
      * Verifies and decodes a signedTransaction obtained from the App Store Server API, an App Store Server
      * Notification, or from a device
+     * See https://developer.apple.com/documentation/appstoreserverapi/jwstransaction
      *
      * @param string $signedTransaction The signedRenewalInfo field
      * @return JWSTransactionDecodedPayload The decoded transaction info after verification
@@ -72,6 +74,7 @@ class SignedDataVerifier
 
     /**
      * Verifies and decodes an App Store Server Notification signedPayload
+     * See https://developer.apple.com/documentation/appstoreservernotifications/signedpayload
      *
      * @param string $signedPayload The payload received by your server
      * @return ResponseBodyV2DecodedPayload The decoded payload after verification
@@ -126,6 +129,7 @@ class SignedDataVerifier
 
     /**
      * Verifies and decodes a signed AppTransaction
+     * See https://developer.apple.com/documentation/storekit/apptransaction
      *
      * @param string $signedAppTransaction The signed AppTransaction
      * @return AppTransaction The decoded AppTransaction after validation
