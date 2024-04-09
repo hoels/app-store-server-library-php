@@ -26,11 +26,13 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use JsonSerializable;
+use ValueError;
 
 class AppStoreServerAPIClient
 {
     const USER_AGENT = "app-store-server-library/php/1.1.0";
     const PRODUCTION_URL = "https://api.storekit.itunes.apple.com";
+    const LOCAL_TESTING_URL = "https://local-testing-base-url";
     const SANDBOX_URL = "https://api.storekit-sandbox.itunes.apple.com";
     const APP_STORE_CONNECT_AUDIENCE = "appstoreconnect-v1";
 
@@ -47,12 +49,20 @@ class AppStoreServerAPIClient
         Environment $environment,
         ?Client $client = null,
     ) {
+        if ($environment === Environment::XCODE) {
+            throw new ValueError("Xcode is not a supported environment for an AppStoreServerAPIClient");
+        } elseif ($environment === Environment::PRODUCTION) {
+            $this->baseUrl = self::PRODUCTION_URL;
+        } elseif ($environment === Environment::LOCAL_TESTING) {
+            $this->baseUrl = self::LOCAL_TESTING_URL;
+        } else {
+            $this->baseUrl = self::SANDBOX_URL;
+        }
         $this->client = $client ?? new Client([
             RequestOptions::TIMEOUT => 30,
             RequestOptions::CONNECT_TIMEOUT => 30,
             RequestOptions::HTTP_ERRORS => false,
         ]);
-        $this->baseUrl = $environment === Environment::PRODUCTION ? self::PRODUCTION_URL : self::SANDBOX_URL;
     }
 
     private function generateToken(): string

@@ -37,6 +37,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\TestCase;
+use ValueError;
 
 class AppStoreServerAPIClientTest extends TestCase
 {
@@ -53,7 +54,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/extendRenewalDateForAllActiveSubscribersResponse.json",
             expectedMethod: "POST",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/subscriptions/extend/mass",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/subscriptions/extend/mass",
             expectedParams: [],
             expectedJson: [
                 "extendByDays" => 45,
@@ -90,7 +91,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/extendSubscriptionRenewalDateResponse.json",
             expectedMethod: "PUT",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/subscriptions/extend/4124214",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/subscriptions/extend/4124214",
             expectedParams: [],
             expectedJson: [
                 "extendByDays" => 45,
@@ -119,12 +120,12 @@ class AppStoreServerAPIClientTest extends TestCase
     /**
      * @throws APIException
      */
-    public function testGetAllSubscriptionStatusesResponse(): void
+    public function testGetAllSubscriptionStatuses(): void
     {
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/getAllSubscriptionStatusesResponse.json",
             expectedMethod: "GET",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/subscriptions/4321",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/subscriptions/4321",
             expectedParams: [
                 "status" => ["2", "1"]
             ],
@@ -181,7 +182,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/getRefundHistoryResponse.json",
             expectedMethod: "GET",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v2/refund/lookup/555555",
+            expectedUrl: "https://local-testing-base-url/inApps/v2/refund/lookup/555555",
             expectedParams: [
                 "revision" => ["revision_input"]
             ],
@@ -209,7 +210,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/getStatusOfSubscriptionRenewalDateExtensionsResponse.json",
             expectedMethod: "GET",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/subscriptions/extend/mass/"
+            expectedUrl: "https://local-testing-base-url/inApps/v1/subscriptions/extend/mass/"
                 . "20fba8a0-2b80-4a7d-a17f-85c1854727f8/com.example.product",
             expectedParams: [],
             expectedJson: null
@@ -238,7 +239,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/getTestNotificationStatusResponse.json",
             expectedMethod: "GET",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/notifications/test/"
+            expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/test/"
                 . "8cd2974c-f905-492a-bf9a-b2f47c791d19",
             expectedParams: [],
             expectedJson: null
@@ -264,7 +265,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/getNotificationHistoryResponse.json",
             expectedMethod: "POST",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/notifications/history",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/history",
             expectedParams: [
                 "paginationToken" => ["a036bc0e-52b8-4bee-82fc-8c24cb6715d6"]
             ],
@@ -323,7 +324,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/transactionHistoryResponse.json",
             expectedMethod: "GET",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/history/1234",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/history/1234",
             expectedParams: [
                 "revision" => ["revision_input"],
                 "startDate" => ["123455"],
@@ -374,7 +375,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/transactionInfoResponse.json",
             expectedMethod: "GET",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/transactions/1234",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/1234",
             expectedParams: [],
             expectedJson: null
         );
@@ -394,7 +395,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/lookupOrderIdResponse.json",
             expectedMethod: "GET",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/lookup/W002182",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/lookup/W002182",
             expectedParams: [],
             expectedJson: null
         );
@@ -418,7 +419,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/requestTestNotificationResponse.json",
             expectedMethod: "POST",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/notifications/test",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/test",
             expectedParams: [],
             expectedJson: null
         );
@@ -439,7 +440,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBody(
             body: "",
             expectedMethod: "PUT",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/transactions/consumption/49571273",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/consumption/49571273",
             expectedParams: [],
             expectedJson: [
                 "customerConsented" => true,
@@ -482,7 +483,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/apiException.json",
             expectedMethod: "POST",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/notifications/test",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/test",
             expectedParams: [],
             expectedJson: null,
             statusCode: 500
@@ -500,12 +501,30 @@ class AppStoreServerAPIClientTest extends TestCase
         self::fail("Expected client to throw APIException.");
     }
 
+    public function testXcodeNotSupportedError(): void
+    {
+        try {
+            new AppStoreServerAPIClient(
+                signingKey: $this->getSigningKey(),
+                keyId: self::KEY_ID,
+                issuerId: self::ISSUER_ID,
+                bundleId: self::BUNDLE_ID,
+                environment: Environment::XCODE
+            );
+        } catch (ValueError $e) {
+            self::assertEquals("Xcode is not a supported environment for an AppStoreServerAPIClient", $e->getMessage());
+            return;
+        }
+
+        self::fail("Expected client to throw ValueError.");
+    }
+
     public function testApiTooManyRequests(): void
     {
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/apiTooManyRequestsException.json",
             expectedMethod: "POST",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/notifications/test",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/test",
             expectedParams: [],
             expectedJson: null,
             statusCode: 429
@@ -528,7 +547,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/apiUnknownError.json",
             expectedMethod: "POST",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/notifications/test",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/test",
             expectedParams: [],
             expectedJson: null,
             statusCode: 400
@@ -554,7 +573,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/transactionHistoryResponseWithMalformedEnvironment.json",
             expectedMethod: "GET",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/history/1234",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/history/1234",
             expectedParams: [
                 "revision" => ["revision_input"],
                 "startDate" => ["123455"],
@@ -597,7 +616,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/transactionHistoryResponseWithMalformedAppAppleId.json",
             expectedMethod: "GET",
-            expectedUrl: "https://api.storekit-sandbox.itunes.apple.com/inApps/v1/history/1234",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/history/1234",
             expectedParams: [
                 "revision" => ["revision_input"],
                 "startDate" => ["123455"],
@@ -630,6 +649,14 @@ class AppStoreServerAPIClientTest extends TestCase
         );
 
         self::assertNull($transactionHistoryResponse->getAppAppleId());
+    }
+
+    private function getSigningKey(): string
+    {
+        $signingKey = file_get_contents(__DIR__ . "/resources/certs/testSigningKey.p8");
+        self::assertNotFalse($signingKey);
+
+        return $signingKey;
     }
 
     private function getClientWithBody(
@@ -694,10 +721,8 @@ class AppStoreServerAPIClientTest extends TestCase
             )
             ->willReturn($response);
 
-        $signingKey = file_get_contents(__DIR__ . "/resources/certs/testSigningKey.p8");
-        self::assertNotFalse($signingKey);
         return new AppStoreServerAPIClient(
-            signingKey: $signingKey,
+            signingKey: $this->getSigningKey(),
             keyId: self::KEY_ID,
             issuerId: self::ISSUER_ID,
             bundleId: self::BUNDLE_ID,
