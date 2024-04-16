@@ -268,7 +268,7 @@ class JWSTransactionDecodedPayload
 
     /**
      * The reason for the purchase transaction, which indicates whether it's a customer's purchase or a renewal for an
-     * auto-renewable subscription that the system initates.
+     * auto-renewable subscription that the system initiates.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/transactionreason
      */

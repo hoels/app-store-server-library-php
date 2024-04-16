@@ -57,7 +57,7 @@ class SignedDataVerifier
      * Notification, or from a device
      * See https://developer.apple.com/documentation/appstoreserverapi/jwstransaction
      *
-     * @param string $signedTransaction The signedRenewalInfo field
+     * @param string $signedTransaction The signedTransaction field
      * @return JWSTransactionDecodedPayload The decoded transaction info after verification
      * @throws VerificationException Thrown if the data could not be verified
      */
