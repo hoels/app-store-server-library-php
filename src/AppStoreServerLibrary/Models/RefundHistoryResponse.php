@@ -25,6 +25,8 @@ class RefundHistoryResponse
      * A list of up to 20 JWS transactions, or an empty array if the customer hasn't received any refunds in your app.
      * The transactions are sorted in ascending order by revocationDate.
      *
+     * https://developer.apple.com/documentation/appstoreserverapi/jwstransaction
+     *
      * @return string[]|null
      */
     public function getSignedTransactions(): ?array

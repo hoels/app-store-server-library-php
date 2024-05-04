@@ -5,7 +5,7 @@ namespace AppStoreServerLibrary\Models;
 /**
  * A notification type value that App Store Server Notifications V2 uses.
  *
- * https://developer.apple.com/documentation/appstoreserverapi/notificationtype
+ * https://developer.apple.com/documentation/appstoreservernotifications/notificationtype
  */
 enum NotificationTypeV2: string
 {

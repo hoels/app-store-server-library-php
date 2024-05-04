@@ -28,6 +28,8 @@ class OrderLookupResponse
     /**
      * An array of in-app purchase transactions that are part of order, signed by Apple, in JSON Web Signature format.
      *
+     * https://developer.apple.com/documentation/appstoreserverapi/jwstransaction
+     *
      * @return string[]|null
      */
     public function getSignedTransactions(): ?array

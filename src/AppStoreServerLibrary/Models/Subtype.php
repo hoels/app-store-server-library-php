@@ -3,9 +3,9 @@
 namespace AppStoreServerLibrary\Models;
 
 /**
- * A notification subtype value that App Store Server Notifications 2 uses.
+ * A notification subtype value that App Store Server Notifications V2 uses.
  *
- * https://developer.apple.com/documentation/appstoreserverapi/notificationsubtype
+ * https://developer.apple.com/documentation/appstoreservernotifications/subtype
  */
 enum Subtype: string
 {

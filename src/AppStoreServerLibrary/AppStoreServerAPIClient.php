@@ -332,7 +332,8 @@ class AppStoreServerAPIClient
      * @param string|null $revision A token you provide to get the next set of up to 20 transactions. All responses
      * include a revision token. Note: For requests that use the revision token, include the same query parameters from
      * the initial request. Use the revision token from the previous HistoryResponse.
-     * @param TransactionHistoryRequest|null $transactionHistoryRequest
+     * @param TransactionHistoryRequest|null $transactionHistoryRequest Optional additional request parameters,
+     * including the startDate, endDate, productIds, and productTypes.
      * @return HistoryResponse A response that contains the customer's transaction history for an app.
      * @throws APIException If a response was returned indicating the request could not be processed
      */
