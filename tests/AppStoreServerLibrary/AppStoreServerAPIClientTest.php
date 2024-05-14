@@ -23,6 +23,7 @@ use AppStoreServerLibrary\Models\NotificationTypeV2;
 use AppStoreServerLibrary\Models\OrderLookupStatus;
 use AppStoreServerLibrary\Models\Platform;
 use AppStoreServerLibrary\Models\PlayTime;
+use AppStoreServerLibrary\Models\RefundPreference;
 use AppStoreServerLibrary\Models\SendAttemptItem;
 use AppStoreServerLibrary\Models\SendAttemptResult;
 use AppStoreServerLibrary\Models\Status;
@@ -453,7 +454,8 @@ class AppStoreServerAPIClientTest extends TestCase
                 "playTime" => 5,
                 "lifetimeDollarsRefunded" => 6,
                 "lifetimeDollarsPurchased" => 7,
-                "userStatus" => 4
+                "userStatus" => 4,
+                "refundPreference" => 3
             ]
         );
 
@@ -469,7 +471,8 @@ class AppStoreServerAPIClientTest extends TestCase
             lifetimeDollarsRefunded: LifetimeDollarsRefunded::
                 ONE_THOUSAND_DOLLARS_TO_ONE_THOUSAND_NINE_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS,
             lifetimeDollarsPurchased: LifetimeDollarsPurchased::TWO_THOUSAND_DOLLARS_OR_GREATER,
-            userStatus: UserStatus::LIMITED_ACCESS
+            userStatus: UserStatus::LIMITED_ACCESS,
+            refundPreference: RefundPreference::NO_PREFERENCE
         );
 
         $client->sendConsumptionData(

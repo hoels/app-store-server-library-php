@@ -23,6 +23,7 @@ class ConsumptionRequest implements JsonSerializable
         private readonly LifetimeDollarsRefunded $lifetimeDollarsRefunded,
         private readonly LifetimeDollarsPurchased $lifetimeDollarsPurchased,
         private readonly UserStatus $userStatus,
+        private readonly RefundPreference $refundPreference,
     ) {
     }
 
@@ -138,6 +139,17 @@ class ConsumptionRequest implements JsonSerializable
     public function getUserStatus(): UserStatus
     {
         return $this->userStatus;
+    }
+
+    /**
+     * A value that indicates your preference, based on your operational logic, as to whether Apple should grant the
+     * refund.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/refundpreference
+     */
+    public function getRefundPreference(): RefundPreference
+    {
+        return $this->refundPreference;
     }
 
     /**

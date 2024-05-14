@@ -3,7 +3,7 @@
 namespace AppStoreServerLibrary\Models;
 
 /**
- * A notification subtype value that App Store Server Notifications V2 uses.
+ * A string that provides details about select notification types in version 2.
  *
  * https://developer.apple.com/documentation/appstoreservernotifications/subtype
  */

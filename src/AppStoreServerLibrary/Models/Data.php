@@ -19,6 +19,7 @@ class Data
         private readonly ?string $signedTransactionInfo,
         private readonly ?string $signedRenewalInfo,
         private readonly ?Status $status,
+        private readonly ?ConsumptionRequestReason $consumptionRequestReason,
     ) {
     }
 
@@ -92,6 +93,16 @@ class Data
         return $this->status;
     }
 
+    /**
+     * The reason the customer requested the refund.
+     *
+     * https://developer.apple.com/documentation/appstoreservernotifications/consumptionrequestreason
+     */
+    public function getConsumptionRequestReason(): ?ConsumptionRequestReason
+    {
+        return $this->consumptionRequestReason;
+    }
+
     public static function fromObject(stdClass $obj): Data
     {
         return new Data(
@@ -109,7 +120,10 @@ class Data
             signedRenewalInfo: property_exists($obj, "signedRenewalInfo") && is_string($obj->signedRenewalInfo)
                 ? $obj->signedRenewalInfo : null,
             status: property_exists($obj, "status") && is_int($obj->status)
-                ? Status::tryFrom($obj->status) : null
+                ? Status::tryFrom($obj->status) : null,
+            consumptionRequestReason: property_exists($obj, "consumptionRequestReason")
+                && is_string($obj->consumptionRequestReason)
+                ? ConsumptionRequestReason::tryFrom($obj->consumptionRequestReason) : null
         );
     }
 }

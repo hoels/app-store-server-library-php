@@ -3,6 +3,7 @@
 namespace AppStoreServerLibrary\Tests;
 
 use AppStoreServerLibrary\Models\AutoRenewStatus;
+use AppStoreServerLibrary\Models\ConsumptionRequestReason;
 use AppStoreServerLibrary\Models\Environment;
 use AppStoreServerLibrary\Models\ExpirationIntent;
 use AppStoreServerLibrary\Models\InAppOwnershipType;
@@ -144,6 +145,39 @@ class SignedDataVerifierTest extends TestCase
         self::assertEquals("signed_transaction_info_value", $notification->getData()->getSignedTransactionInfo());
         self::assertEquals("signed_renewal_info_value", $notification->getData()->getSignedRenewalInfo());
         self::assertEquals(Status::ACTIVE, $notification->getData()->getStatus());
+        self::assertNull($notification->getData()->getConsumptionRequestReason());
+    }
+
+    /**
+     * @throws VerificationException
+     */
+    public function testSelfSignedConsumptionRequestNotificationDecoding(): void
+    {
+        $signedNotification = $this->createSignedDataFromJson(
+            path: __DIR__ . "/resources/models/signedConsumptionRequestNotification.json"
+        );
+        $signedDataVerifier = $this->getDefaultSignedDataVerifier();
+
+        $notification = $signedDataVerifier->verifyAndDecodeNotification($signedNotification);
+        self::assertEquals(NotificationTypeV2::CONSUMPTION_REQUEST, $notification->getNotificationType());
+        self::assertNull($notification->getSubtype());
+        self::assertEquals("002e14d5-51f5-4503-b5a8-c3a1af68eb20", $notification->getNotificationUUID());
+        self::assertEquals("2.0", $notification->getVersion());
+        self::assertEquals(1698148900000, $notification->getSignedDate());
+        self::assertNotNull($notification->getData());
+        self::assertNull($notification->getSummary());
+        self::assertNull($notification->getExternalPurchaseToken());
+        self::assertEquals(Environment::LOCAL_TESTING, $notification->getData()->getEnvironment());
+        self::assertEquals(41234, $notification->getData()->getAppAppleId());
+        self::assertEquals("com.example", $notification->getData()->getBundleId());
+        self::assertEquals("1.2.3", $notification->getData()->getBundleVersion());
+        self::assertEquals("signed_transaction_info_value", $notification->getData()->getSignedTransactionInfo());
+        self::assertEquals("signed_renewal_info_value", $notification->getData()->getSignedRenewalInfo());
+        self::assertEquals(Status::ACTIVE, $notification->getData()->getStatus());
+        self::assertEquals(
+            ConsumptionRequestReason::UNINTENDED_PURCHASE,
+            $notification->getData()->getConsumptionRequestReason()
+        );
     }
 
     /**
