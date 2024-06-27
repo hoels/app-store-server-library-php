@@ -26,6 +26,9 @@ class JWSRenewalInfoDecodedPayload
         private readonly ?Environment $environment,
         private readonly ?int $recentSubscriptionStartDate,
         private readonly ?int $renewalDate,
+        private readonly ?string $currency,
+        private readonly ?int $renewalPrice,
+        private readonly ?OfferDiscountType $offerDiscountType,
     ) {
     }
     
@@ -171,6 +174,36 @@ class JWSRenewalInfoDecodedPayload
         return $this->renewalDate;
     }
 
+    /**
+     * The currency code for the renewalPrice of the subscription.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/currency
+     */
+    public function getCurrency(): ?string
+    {
+        return $this->currency;
+    }
+
+    /**
+     * The renewal price, in milliunits, of the auto-renewable subscription that renews at the next billing period.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/renewalprice
+     */
+    public function getRenewalPrice(): ?int
+    {
+        return $this->renewalPrice;
+    }
+
+    /**
+     * The payment mode of the discount offer.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/offerdiscounttype
+     */
+    public function getOfferDiscountType(): ?OfferDiscountType
+    {
+        return $this->offerDiscountType;
+    }
+
     public static function fromObject(stdClass $obj): JWSRenewalInfoDecodedPayload
     {
         return new JWSRenewalInfoDecodedPayload(
@@ -208,6 +241,12 @@ class JWSRenewalInfoDecodedPayload
             renewalDate: property_exists($obj, "renewalDate")
                 && (is_int($obj->renewalDate) || is_float($obj->renewalDate))
                 ? intval($obj->renewalDate) : null,
+            currency: property_exists($obj, "currency") && is_string($obj->currency)
+                ? $obj->currency : null,
+            renewalPrice: property_exists($obj, "renewalPrice") && is_int($obj->renewalPrice)
+                ? $obj->renewalPrice : null,
+            offerDiscountType: property_exists($obj, "offerDiscountType") && is_string($obj->offerDiscountType)
+                ? OfferDiscountType::tryFrom($obj->offerDiscountType) : null,
         );
     }
 }

@@ -3,6 +3,7 @@
 namespace AppStoreServerLibrary;
 
 use AppStoreServerLibrary\AppStoreServerAPIClient\APIException;
+use AppStoreServerLibrary\AppStoreServerAPIClient\GetTransactionHistoryVersion;
 use AppStoreServerLibrary\Models\CheckTestNotificationResponse;
 use AppStoreServerLibrary\Models\ConsumptionRequest;
 use AppStoreServerLibrary\Models\Environment;
@@ -30,7 +31,7 @@ use ValueError;
 
 class AppStoreServerAPIClient
 {
-    const USER_AGENT = "app-store-server-library/php/1.2.0";
+    const USER_AGENT = "app-store-server-library/php/1.3.0";
     const PRODUCTION_URL = "https://api.storekit.itunes.apple.com";
     const LOCAL_TESTING_URL = "https://local-testing-base-url";
     const SANDBOX_URL = "https://api.storekit-sandbox.itunes.apple.com";
@@ -334,49 +335,52 @@ class AppStoreServerAPIClient
      * the initial request. Use the revision token from the previous HistoryResponse.
      * @param TransactionHistoryRequest|null $transactionHistoryRequest Optional additional request parameters,
      * including the startDate, endDate, productIds, and productTypes.
+     * @param GetTransactionHistoryVersion $version The version of the Get Transaction History endpoint to use. V2 is
+     * recommended.
      * @return HistoryResponse A response that contains the customer's transaction history for an app.
      * @throws APIException If a response was returned indicating the request could not be processed
      */
     public function getTransactionHistory(
         string $transactionId,
         ?string $revision = null,
-        ?TransactionHistoryRequest $transactionHistoryRequest = null
+        ?TransactionHistoryRequest $transactionHistoryRequest = null,
+        GetTransactionHistoryVersion $version = GetTransactionHistoryVersion::V1
     ): HistoryResponse {
         $queryParameters = [];
         if ($revision !== null) {
             $queryParameters["revision"] = [$revision];
         }
         if ($transactionHistoryRequest?->getStartDate() !== null) {
-            $queryParameters["startDate"] = ["" . $transactionHistoryRequest?->getStartDate()];
+            $queryParameters["startDate"] = ["" . $transactionHistoryRequest->getStartDate()];
         }
         if ($transactionHistoryRequest?->getEndDate() !== null) {
-            $queryParameters["endDate"] = ["" . $transactionHistoryRequest?->getEndDate()];
+            $queryParameters["endDate"] = ["" . $transactionHistoryRequest->getEndDate()];
         }
         if ($transactionHistoryRequest?->getProductIds() !== null) {
-            $queryParameters["productId"] = $transactionHistoryRequest?->getProductIds();
+            $queryParameters["productId"] = $transactionHistoryRequest->getProductIds();
         }
         if ($transactionHistoryRequest?->getProductTypes() !== null) {
             $queryParameters["productType"] = array_map(
                 fn ($productType) => $productType->value,
-                $transactionHistoryRequest?->getProductTypes()
+                $transactionHistoryRequest->getProductTypes()
             );
         }
         if ($transactionHistoryRequest?->getSort() !== null) {
-            $queryParameters["sort"] = [$transactionHistoryRequest?->getSort()->value];
+            $queryParameters["sort"] = [$transactionHistoryRequest->getSort()->value];
         }
         if ($transactionHistoryRequest?->getSubscriptionGroupIdentifiers() !== null) {
             $queryParameters["subscriptionGroupIdentifier"] = $transactionHistoryRequest
                 ->getSubscriptionGroupIdentifiers();
         }
         if ($transactionHistoryRequest?->getInAppOwnershipType() !== null) {
-            $queryParameters["inAppOwnershipType"] = [$transactionHistoryRequest?->getInAppOwnershipType()->value];
+            $queryParameters["inAppOwnershipType"] = [$transactionHistoryRequest->getInAppOwnershipType()->value];
         }
         if ($transactionHistoryRequest?->getRevoked() !== null) {
-            $queryParameters["revoked"] = [$transactionHistoryRequest?->getRevoked() ? "true" : "false"];
+            $queryParameters["revoked"] = [$transactionHistoryRequest->getRevoked() ? "true" : "false"];
         }
 
         $responseBody = $this->makeRequest(
-            path: "/inApps/v1/history/" . $transactionId,
+            path: "/inApps/" . $version->value . "/history/" . $transactionId,
             method: "GET",
             queryParameters: $queryParameters,
             body: null

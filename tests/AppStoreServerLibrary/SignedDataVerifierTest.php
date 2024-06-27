@@ -117,6 +117,9 @@ class SignedDataVerifierTest extends TestCase
         self::assertEquals(Environment::LOCAL_TESTING, $renewalInfo->getEnvironment());
         self::assertEquals(1698148800000, $renewalInfo->getRecentSubscriptionStartDate());
         self::assertEquals(1698148850000, $renewalInfo->getRenewalDate());
+        self::assertEquals("USD", $renewalInfo->getCurrency());
+        self::assertEquals(9990, $renewalInfo->getRenewalPrice());
+        self::assertEquals(OfferDiscountType::PAY_AS_YOU_GO, $renewalInfo->getOfferDiscountType());
     }
 
     /**

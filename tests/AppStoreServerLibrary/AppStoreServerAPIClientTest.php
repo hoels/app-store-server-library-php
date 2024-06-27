@@ -320,7 +320,7 @@ class AppStoreServerAPIClientTest extends TestCase
     /**
      * @throws APIException
      */
-    public function testGetTransactionHistory(): void
+    public function testGetTransactionHistoryV1(): void
     {
         $client = $this->getClientWithBodyFromFile(
             path: __DIR__ . "/resources/models/transactionHistoryResponse.json",
@@ -354,7 +354,60 @@ class AppStoreServerAPIClientTest extends TestCase
         $transactionHistoryResponse = $client->getTransactionHistory(
             transactionId: "1234",
             revision: "revision_input",
-            transactionHistoryRequest: $transactionHistoryRequest
+            transactionHistoryRequest: $transactionHistoryRequest,
+            version: AppStoreServerAPIClient\GetTransactionHistoryVersion::V1
+        );
+
+        self::assertEquals("revision_output", $transactionHistoryResponse->getRevision());
+        self::assertTrue($transactionHistoryResponse->getHasMore());
+        self::assertEquals("com.example", $transactionHistoryResponse->getBundleId());
+        self::assertEquals(323232, $transactionHistoryResponse->getAppAppleId());
+        self::assertEquals(Environment::LOCAL_TESTING, $transactionHistoryResponse->getEnvironment());
+        self::assertEquals(
+            ["signed_transaction_value", "signed_transaction_value2"],
+            $transactionHistoryResponse->getSignedTransactions()
+        );
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testGetTransactionHistoryV2(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/transactionHistoryResponse.json",
+            expectedMethod: "GET",
+            expectedUrl: "https://local-testing-base-url/inApps/v2/history/1234",
+            expectedParams: [
+                "revision" => ["revision_input"],
+                "startDate" => ["123455"],
+                "endDate" => ["123456"],
+                "productId" => ["com.example.1", "com.example.2"],
+                "productType" => ["CONSUMABLE", "AUTO_RENEWABLE"],
+                "sort" => ["ASCENDING"],
+                "subscriptionGroupIdentifier" => ["sub_group_id", "sub_group_id_2"],
+                "inAppOwnershipType" => ["FAMILY_SHARED"],
+                "revoked" => ["false"],
+            ],
+            expectedJson: null
+        );
+
+        $transactionHistoryRequest = new TransactionHistoryRequest(
+            startDate: 123455,
+            endDate: 123456,
+            productIds: ["com.example.1", "com.example.2"],
+            productTypes: [ProductType::CONSUMABLE, ProductType::AUTO_RENEWABLE],
+            sort: Order::ASCENDING,
+            subscriptionGroupIdentifiers: ["sub_group_id", "sub_group_id_2"],
+            inAppOwnershipType: InAppOwnershipType::FAMILY_SHARED,
+            revoked: false
+        );
+
+        $transactionHistoryResponse = $client->getTransactionHistory(
+            transactionId: "1234",
+            revision: "revision_input",
+            transactionHistoryRequest: $transactionHistoryRequest,
+            version: AppStoreServerAPIClient\GetTransactionHistoryVersion::V2
         );
 
         self::assertEquals("revision_output", $transactionHistoryResponse->getRevision());
