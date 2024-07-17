@@ -11,6 +11,9 @@ use stdClass;
  */
 class JWSRenewalInfoDecodedPayload
 {
+    /**
+     * @param string[]|null $eligibleWinBackOfferIds
+     */
     public function __construct(
         private readonly ?ExpirationIntent $expirationIntent,
         private readonly ?string $originalTransactionId,
@@ -29,6 +32,7 @@ class JWSRenewalInfoDecodedPayload
         private readonly ?string $currency,
         private readonly ?int $renewalPrice,
         private readonly ?OfferDiscountType $offerDiscountType,
+        private readonly ?array $eligibleWinBackOfferIds,
     ) {
     }
     
@@ -204,6 +208,19 @@ class JWSRenewalInfoDecodedPayload
         return $this->offerDiscountType;
     }
 
+    /**
+     * An array of win-back offer identifiers that a customer is eligible to redeem, which sorts the identifiers to
+     * present the better offers first.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/eligiblewinbackofferids
+     *
+     * @return string[]|null
+     */
+    public function getEligibleWinBackOfferIds(): ?array
+    {
+        return $this->eligibleWinBackOfferIds;
+    }
+
     public static function fromObject(stdClass $obj): JWSRenewalInfoDecodedPayload
     {
         return new JWSRenewalInfoDecodedPayload(
@@ -247,6 +264,9 @@ class JWSRenewalInfoDecodedPayload
                 ? $obj->renewalPrice : null,
             offerDiscountType: property_exists($obj, "offerDiscountType") && is_string($obj->offerDiscountType)
                 ? OfferDiscountType::tryFrom($obj->offerDiscountType) : null,
+            eligibleWinBackOfferIds: property_exists($obj, "eligibleWinBackOfferIds")
+                && is_array($obj->eligibleWinBackOfferIds)
+                ? $obj->eligibleWinBackOfferIds : null,
         );
     }
 }

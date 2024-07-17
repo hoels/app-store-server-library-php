@@ -120,6 +120,7 @@ class SignedDataVerifierTest extends TestCase
         self::assertEquals("USD", $renewalInfo->getCurrency());
         self::assertEquals(9990, $renewalInfo->getRenewalPrice());
         self::assertEquals(OfferDiscountType::PAY_AS_YOU_GO, $renewalInfo->getOfferDiscountType());
+        self::assertEquals(["eligible1", "eligible2"], $renewalInfo->getEligibleWinBackOfferIds());
     }
 
     /**
