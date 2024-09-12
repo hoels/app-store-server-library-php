@@ -3,6 +3,8 @@
 namespace AppStoreServerLibrary;
 
 use AppStoreServerLibrary\Models\Environment;
+use AppStoreServerLibrary\OCSP\Ocsp;
+use AppStoreServerLibrary\OCSP\OcspRequest;
 use AppStoreServerLibrary\SignedDataVerifier\VerificationException;
 use AppStoreServerLibrary\SignedDataVerifier\VerificationStatus;
 use AppStoreServerLibrary\X509\Certificate;
@@ -22,8 +24,6 @@ use web_eid\ocsp_php\certificate\CertificateLoader;
 use web_eid\ocsp_php\exceptions\OcspCertificateException;
 use web_eid\ocsp_php\exceptions\OcspResponseDecodeException;
 use web_eid\ocsp_php\exceptions\OcspVerifyFailedException;
-use web_eid\ocsp_php\Ocsp;
-use web_eid\ocsp_php\OcspRequest;
 use web_eid\ocsp_php\OcspResponse;
 
 class ChainVerifier
@@ -167,13 +167,13 @@ class ChainVerifier
         // optionally, check OCSP status
         if ($performOnlineChecks) {
             $this->checkOcspStatus(
-                cert: $leafCertificate,
-                issuer: $intermediateCertificate,
+                cert: $intermediateCertificate,
+                issuer: $usedRootCertificate,
                 root: $usedRootCertificate
             );
             $this->checkOcspStatus(
-                cert: $intermediateCertificate,
-                issuer: $usedRootCertificate,
+                cert: $leafCertificate,
+                issuer: $intermediateCertificate,
                 root: $usedRootCertificate
             );
         }
