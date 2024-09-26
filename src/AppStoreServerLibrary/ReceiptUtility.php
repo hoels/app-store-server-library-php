@@ -11,6 +11,7 @@ class ReceiptUtility
     const PKCS7_OID = "1.2.840.113549.1.7.2";
     const IN_APP_ARRAY = 17;
     const TRANSACTION_IDENTIFIER = 1703;
+    const ORIGINAL_TRANSACTION_IDENTIFIER = 1705;
 
 
     /**
@@ -86,7 +87,10 @@ class ReceiptUtility
                     if ($type === ASN1::TYPE_INTEGER
                         && ($value === self::TRANSACTION_IDENTIFIER
                             || ($value instanceof BigInteger
-                                && $value->compare(new BigInteger(self::TRANSACTION_IDENTIFIER)) === 0))
+                                && $value->compare(new BigInteger(self::TRANSACTION_IDENTIFIER)) === 0)
+                            || $value === self::ORIGINAL_TRANSACTION_IDENTIFIER
+                            || ($value instanceof BigInteger
+                                && $value->compare(new BigInteger(self::ORIGINAL_TRANSACTION_IDENTIFIER)) === 0))
                     ) {
                         $currentRead = $loopCurrentInApp["content"][2] ?? null;
                         $type = $currentRead["type"] ?? null;
