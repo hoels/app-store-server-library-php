@@ -3,8 +3,6 @@
 namespace AppStoreServerLibrary;
 
 use AppStoreServerLibrary\Models\Environment;
-use AppStoreServerLibrary\OCSP\Ocsp;
-use AppStoreServerLibrary\OCSP\OcspRequest;
 use AppStoreServerLibrary\SignedDataVerifier\VerificationException;
 use AppStoreServerLibrary\SignedDataVerifier\VerificationStatus;
 use AppStoreServerLibrary\X509\Certificate;
@@ -17,14 +15,15 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use InvalidArgumentException;
+use OCSP\Certificate\CertificateLoader;
+use OCSP\Exceptions\OcspCertificateException;
+use OCSP\Exceptions\OcspResponseDecodeException;
+use OCSP\Exceptions\OcspVerifyFailedException;
+use OCSP\OcspRequest;
+use OCSP\OcspResponse;
 use OpenSSLAsymmetricKey;
 use phpseclib3\File\X509;
 use stdClass;
-use web_eid\ocsp_php\certificate\CertificateLoader;
-use web_eid\ocsp_php\exceptions\OcspCertificateException;
-use web_eid\ocsp_php\exceptions\OcspResponseDecodeException;
-use web_eid\ocsp_php\exceptions\OcspVerifyFailedException;
-use web_eid\ocsp_php\OcspResponse;
 
 class ChainVerifier
 {
@@ -193,10 +192,9 @@ class ChainVerifier
 
         // generate OCSP request
         try {
-            $certificateLoader = (new CertificateLoader())->fromString($cert->getPem());
-            $certX509 = $certificateLoader->getCert();
-            $issuerX509 = (new CertificateLoader())->fromString($issuer->getPem())->getCert();
-            $certificateId = (new Ocsp())->generateCertificateId($certX509, $issuerX509);
+            $certX509 = CertificateLoader::fromString($cert->getPem());
+            $issuerX509 = CertificateLoader::fromString($issuer->getPem());
+            $certificateId = CertificateLoader::generateCertificateId($certX509, $issuerX509);
         } catch (OcspCertificateException) {
             throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);
         }
@@ -216,7 +214,7 @@ class ChainVerifier
                 options: [
                     RequestOptions::BODY => $ocspRequest->getEncodeDer(),
                     RequestOptions::HEADERS => [
-                        "Content-Type" => Ocsp::OCSP_REQUEST_MEDIATYPE,
+                        "Content-Type" => OcspRequest::CONTENT_TYPE,
                     ],
                 ]
             );
@@ -225,7 +223,7 @@ class ChainVerifier
             throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);
         }
         if ($response->getStatusCode() !== 200
-            || $response->getHeaderLine("Content-Type") !== Ocsp::OCSP_RESPONSE_MEDIATYPE
+            || $response->getHeaderLine("Content-Type") !== OcspResponse::CONTENT_TYPE
         ) {
             throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);
         }
