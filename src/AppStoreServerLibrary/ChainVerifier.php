@@ -236,12 +236,13 @@ class ChainVerifier
             $ocspResponse = new OcspResponse((string)$response->getBody());
             $ocspResponse->validateCertificateId($certificateId);
             $ocspResponse->validateSignature();
-        } catch (OcspResponseDecodeException|OcspVerifyFailedException) {
+            $isRevoked = $ocspResponse->isRevoked();
+        } catch (OcspCertificateException|OcspResponseDecodeException|OcspVerifyFailedException) {
             throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);
         }
 
         // check that certificate is still valid (explicitly not revoked)
-        if ($ocspResponse->isRevoked() !== false) {
+        if ($isRevoked !== false) {
             throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);
         }
 
