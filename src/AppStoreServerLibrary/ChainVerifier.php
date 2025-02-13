@@ -220,9 +220,11 @@ class ChainVerifier
             );
         } catch (GuzzleException) {
             // may occur when no connection can be established
-            throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);
+            throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE, isPermanentFailure: false);
         }
-        if ($response->getStatusCode() !== 200
+        if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
+            throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE, isPermanentFailure: false);
+        } elseif ($response->getStatusCode() !== 200
             || $response->getHeaderLine("Content-Type") !== OcspResponse::CONTENT_TYPE
         ) {
             throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);

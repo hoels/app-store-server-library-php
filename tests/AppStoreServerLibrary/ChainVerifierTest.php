@@ -66,6 +66,7 @@ class ChainVerifierTest extends TestCase
             self::fail("Expected VerificationException.");
         } catch (VerificationException $e) {
             self::assertEquals(VerificationStatus::VERIFICATION_FAILURE, $e->getStatus());
+            self::assertTrue($e->isPermanentFailure());
         }
     }
 
@@ -91,6 +92,7 @@ class ChainVerifierTest extends TestCase
             self::fail("Expected VerificationException.");
         } catch (VerificationException $e) {
             self::assertEquals(VerificationStatus::VERIFICATION_FAILURE, $e->getStatus());
+            self::assertTrue($e->isPermanentFailure());
         }
     }
 
@@ -101,13 +103,14 @@ class ChainVerifierTest extends TestCase
             self::fail("Expected VerificationException.");
         } catch (VerificationException $e) {
             self::assertEquals(VerificationStatus::INVALID_CERTIFICATE, $e->getStatus());
+            self::assertTrue($e->isPermanentFailure());
         }
     }
 
     /**
      * @throws Exception
      */
-    public function testChainDifferentThanRottCertificate(): void
+    public function testChainDifferentThanRootCertificate(): void
     {
         $verifier = new ChainVerifier(rootCertificates: [base64_decode(self::REAL_APPLE_ROOT_BASE64_ENCODED)]);
         try {
@@ -123,6 +126,7 @@ class ChainVerifierTest extends TestCase
             self::fail("Expected VerificationException.");
         } catch (VerificationException $e) {
             self::assertEquals(VerificationStatus::VERIFICATION_FAILURE, $e->getStatus());
+            self::assertTrue($e->isPermanentFailure());
         }
     }
 
@@ -145,6 +149,7 @@ class ChainVerifierTest extends TestCase
             self::fail("Expected VerificationException.");
         } catch (VerificationException $e) {
             self::assertEquals(VerificationStatus::VERIFICATION_FAILURE, $e->getStatus());
+            self::assertTrue($e->isPermanentFailure());
         }
     }
 
