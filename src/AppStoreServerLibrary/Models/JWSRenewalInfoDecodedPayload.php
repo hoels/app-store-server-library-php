@@ -33,6 +33,9 @@ class JWSRenewalInfoDecodedPayload
         private readonly ?int $renewalPrice,
         private readonly ?OfferDiscountType $offerDiscountType,
         private readonly ?array $eligibleWinBackOfferIds,
+        private readonly ?string $appAccountToken,
+        private readonly ?string $appTransactionId,
+        private readonly ?string $offerPeriod,
     ) {
     }
     
@@ -221,6 +224,37 @@ class JWSRenewalInfoDecodedPayload
         return $this->eligibleWinBackOfferIds;
     }
 
+    /**
+     * The UUID that an app optionally generates to map a customer's in-app purchase with its resulting App Store
+     * transaction.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/appaccounttoken
+     */
+    public function getAppAccountToken(): ?string
+    {
+        return $this->appAccountToken;
+    }
+
+    /**
+     * The unique identifier of the app download transaction.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/appTransactionId
+     */
+    public function getAppTransactionId(): ?string
+    {
+        return $this->appTransactionId;
+    }
+
+    /**
+     * The duration of the offer.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/offerPeriod
+     */
+    public function getOfferPeriod(): ?string
+    {
+        return $this->offerPeriod;
+    }
+
     public static function fromObject(stdClass $obj): JWSRenewalInfoDecodedPayload
     {
         return new JWSRenewalInfoDecodedPayload(
@@ -267,6 +301,12 @@ class JWSRenewalInfoDecodedPayload
             eligibleWinBackOfferIds: property_exists($obj, "eligibleWinBackOfferIds")
                 && is_array($obj->eligibleWinBackOfferIds)
                 ? $obj->eligibleWinBackOfferIds : null,
+            appAccountToken: property_exists($obj, "appAccountToken") && is_string($obj->appAccountToken)
+                ? $obj->appAccountToken : null,
+            appTransactionId: property_exists($obj, "appTransactionId") && is_string($obj->appTransactionId)
+                ? $obj->appTransactionId : null,
+            offerPeriod: property_exists($obj, "offerPeriod") && is_string($obj->offerPeriod)
+                ? $obj->offerPeriod : null,
         );
     }
 }

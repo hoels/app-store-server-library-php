@@ -115,7 +115,8 @@ class SignedDataVerifier
     /**
      * @throws VerificationException
      */
-    public function verifyNotification(?string $bundleId, ?int $appAppleId, ?Environment $environment): void {
+    public function verifyNotification(?string $bundleId, ?int $appAppleId, ?Environment $environment): void
+    {
         if ($bundleId !== $this->bundleId
             || ($this->environment === Environment::PRODUCTION
                 && $appAppleId !== $this->appAppleId)

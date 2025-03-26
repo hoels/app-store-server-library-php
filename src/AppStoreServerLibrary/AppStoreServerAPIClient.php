@@ -56,8 +56,10 @@ class AppStoreServerAPIClient
             $this->baseUrl = self::PRODUCTION_URL;
         } elseif ($environment === Environment::LOCAL_TESTING) {
             $this->baseUrl = self::LOCAL_TESTING_URL;
-        } else {
+        } elseif ($environment === Environment::SANDBOX) {
             $this->baseUrl = self::SANDBOX_URL;
+        } else {
+            throw new ValueError("Invalid environment provided");
         }
         $this->client = $client ?? new Client([
             RequestOptions::TIMEOUT => 30,

@@ -289,6 +289,13 @@ enum APIError: int
     case INVALID_TRANSACTION_TYPE_NOT_SUPPORTED = 4000047;
 
     /**
+     * An error that indicates the endpoint doesn't support an app transaction ID.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/apptransactionidnotsupportederror
+     */
+    case APP_TRANSACTION_ID_NOT_SUPPORTED_ERROR = 4000048;
+
+    /**
      * An error that indicates the subscription doesn't qualify for a renewal-date extension due to its subscription
      * state.
      *

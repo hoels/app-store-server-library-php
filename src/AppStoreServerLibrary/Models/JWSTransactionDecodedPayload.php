@@ -38,6 +38,8 @@ class JWSTransactionDecodedPayload
         private readonly ?string $currency,
         private readonly ?int $price,
         private readonly ?OfferDiscountType $offerDiscountType,
+        private readonly ?string $appTransactionId,
+        private readonly ?string $offerPeriod,
     ) {
     }
 
@@ -308,6 +310,26 @@ class JWSTransactionDecodedPayload
         return $this->offerDiscountType;
     }
 
+    /**
+     * The unique identifier of the app download transaction.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/appTransactionId
+     */
+    public function getAppTransactionId(): ?string
+    {
+        return $this->appTransactionId;
+    }
+
+    /**
+     * The duration of the offer.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/offerPeriod
+     */
+    public function getOfferPeriod(): ?string
+    {
+        return $this->offerPeriod;
+    }
+
     public static function fromObject(stdClass $obj): JWSTransactionDecodedPayload
     {
         return new JWSTransactionDecodedPayload(
@@ -370,6 +392,10 @@ class JWSTransactionDecodedPayload
                 ? $obj->price : null,
             offerDiscountType: property_exists($obj, "offerDiscountType") && is_string($obj->offerDiscountType)
                 ? OfferDiscountType::tryFrom($obj->offerDiscountType) : null,
+            appTransactionId: property_exists($obj, "appTransactionId") && is_string($obj->appTransactionId)
+                ? $obj->appTransactionId : null,
+            offerPeriod: property_exists($obj, "offerPeriod") && is_string($obj->offerPeriod)
+                ? $obj->offerPeriod : null,
         );
     }
 }

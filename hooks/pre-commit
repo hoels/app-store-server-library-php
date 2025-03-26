@@ -1,0 +1,4 @@
+#!/bin/sh
+
+vendor/bin/phpstan analyse
+vendor/bin/phpcs

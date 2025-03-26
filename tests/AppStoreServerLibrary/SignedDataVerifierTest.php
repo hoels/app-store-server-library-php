@@ -11,6 +11,7 @@ use AppStoreServerLibrary\Models\NotificationTypeV2;
 use AppStoreServerLibrary\Models\OfferDiscountType;
 use AppStoreServerLibrary\Models\OfferType;
 use AppStoreServerLibrary\Models\PriceIncreaseStatus;
+use AppStoreServerLibrary\Models\PurchasePlatform;
 use AppStoreServerLibrary\Models\RevocationReason;
 use AppStoreServerLibrary\Models\Status;
 use AppStoreServerLibrary\Models\Subtype;
@@ -51,6 +52,8 @@ class SignedDataVerifierTest extends TestCase
         self::assertEquals("device_verification_value", $appTransaction->getDeviceVerification());
         self::assertEquals("48ccfa42-7431-4f22-9908-7e88983e105a", $appTransaction->getDeviceVerificationNonce());
         self::assertEquals(1698148700000, $appTransaction->getPreorderDate());
+        self::assertEquals("71134", $appTransaction->getAppTransactionId());
+        self::assertEquals(PurchasePlatform::IOS, $appTransaction->getOriginalPlatform());
     }
 
     /**
@@ -90,6 +93,8 @@ class SignedDataVerifierTest extends TestCase
         self::assertEquals(10990, $transaction->getPrice());
         self::assertEquals("USD", $transaction->getCurrency());
         self::assertEquals(OfferDiscountType::PAY_AS_YOU_GO, $transaction->getOfferDiscountType());
+        self::assertEquals("71134", $transaction->getAppTransactionId());
+        self::assertEquals("P1Y", $transaction->getOfferPeriod());
     }
 
     /**
@@ -121,6 +126,9 @@ class SignedDataVerifierTest extends TestCase
         self::assertEquals(9990, $renewalInfo->getRenewalPrice());
         self::assertEquals(OfferDiscountType::PAY_AS_YOU_GO, $renewalInfo->getOfferDiscountType());
         self::assertEquals(["eligible1", "eligible2"], $renewalInfo->getEligibleWinBackOfferIds());
+        self::assertEquals("71134", $renewalInfo->getAppTransactionId());
+        self::assertEquals("P1Y", $renewalInfo->getOfferPeriod());
+        self::assertEquals("7e3fb20b-4cdb-47cc-936d-99d65f608138", $renewalInfo->getAppAccountToken());
     }
 
     /**

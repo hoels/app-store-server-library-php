@@ -18,6 +18,8 @@ class AppTransaction
         private readonly ?string $deviceVerification,
         private readonly ?string $deviceVerificationNonce,
         private readonly ?int $preorderDate,
+        private readonly ?string $appTransactionId,
+        private readonly ?PurchasePlatform $originalPlatform,
     ) {
     }
 
@@ -131,6 +133,26 @@ class AppTransaction
         return $this->preorderDate;
     }
 
+    /**
+     * The unique identifier of the app download transaction.
+     *
+     * https://developer.apple.com/documentation/storekit/apptransaction/apptransactionid
+     */
+    public function getAppTransactionId(): ?string
+    {
+        return $this->appTransactionId;
+    }
+
+    /**
+     * The platform on which the customer originally purchased the app.
+     *
+     * https://developer.apple.com/documentation/storekit/apptransaction/originalplatform-4mogz
+     */
+    public function getOriginalPlatform(): ?PurchasePlatform
+    {
+        return $this->originalPlatform;
+    }
+
     public static function fromObject(stdClass $obj): AppTransaction
     {
         return new AppTransaction(
@@ -162,6 +184,10 @@ class AppTransaction
             preorderDate: property_exists($obj, "preorderDate")
                 && (is_int($obj->preorderDate) || is_float($obj->preorderDate))
                 ? intval($obj->preorderDate) : null,
+            appTransactionId: property_exists($obj, "appTransactionId") && is_string($obj->appTransactionId)
+                ? $obj->appTransactionId : null,
+            originalPlatform: property_exists($obj, "originalPlatform") && is_string($obj->originalPlatform)
+                ? PurchasePlatform::tryFrom($obj->originalPlatform) : null,
         );
     }
 }
