@@ -1,5 +1,5 @@
 # (Unofficial) Apple App Store Server PHP Library
-The **unofficial** PHP server library for the
+The **unofficial** [PHP](https://github.com/hoels/app-store-server-library-php) server library for the
 [App Store Server API](https://developer.apple.com/documentation/appstoreserverapi) and
 [App Store Server Notifications](https://developer.apple.com/documentation/appstoreservernotifications).
 Also available in
