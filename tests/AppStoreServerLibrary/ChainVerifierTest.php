@@ -29,6 +29,9 @@ class ChainVerifierTest extends TestCase
     // phpcs:enable
 
     const EFFECTIVE_DATE = 1681312846;
+    const CLOCK_DATE = 41231;
+
+    private int $time = self::CLOCK_DATE;
 
 
     /**
@@ -163,6 +166,114 @@ class ChainVerifierTest extends TestCase
         $this->expectNotToPerformAssertions();
         $verifier = new ChainVerifier(rootCertificates: [base64_decode(self::REAL_APPLE_ROOT_BASE64_ENCODED)]);
         $verifier->verifyChain(
+            leafCertificate: Certificate::fromDER(
+                self::REAL_APPLE_SIGNING_CERTIFICATE_BASE64_ENCODED,
+                isBase64Encoded: true
+            ),
+            intermediateCertificate: Certificate::fromDER(
+                self::REAL_APPLE_INTERMEDIATE_BASE64_ENCODED,
+                isBase64Encoded: true
+            ),
+            performOnlineChecks: true,
+            effectiveDate: (new DateTime())->setTimestamp(self::EFFECTIVE_DATE)
+        );
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testOcspResponseCaching(): void
+    {
+        $verifierMock = $this
+            ->getMockBuilder(ChainVerifier::class)
+            ->setConstructorArgs([[base64_decode(self::ROOT_CA_BASE64_ENCODED)]])
+            ->onlyMethods(["verifyChainWithoutCaching"])
+            ->getMock();
+        $verifierMock
+            ->expects($this->once())
+            ->method("verifyChainWithoutCaching")
+            ->willReturn(
+                Certificate::fromDER(self::LEAF_CERT_BASE64_ENCODED, isBase64Encoded: true)->getOpenSSLPublicKey()
+            );
+
+        $verifierMock->verifyChain(
+            leafCertificate: Certificate::fromDER(self::LEAF_CERT_BASE64_ENCODED, isBase64Encoded: true),
+            intermediateCertificate: Certificate::fromDER(self::INTERMEDIATE_CA_BASE64_ENCODED, isBase64Encoded: true),
+            performOnlineChecks: true,
+            effectiveDate: (new DateTime())->setTimestamp(self::EFFECTIVE_DATE)
+        );
+        $verifierMock->verifyChain(
+            leafCertificate: Certificate::fromDER(self::LEAF_CERT_BASE64_ENCODED, isBase64Encoded: true),
+            intermediateCertificate: Certificate::fromDER(self::INTERMEDIATE_CA_BASE64_ENCODED, isBase64Encoded: true),
+            performOnlineChecks: true,
+            effectiveDate: (new DateTime())->setTimestamp(self::EFFECTIVE_DATE)
+        );
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testOcspResponseCachingHasExpiration(): void
+    {
+        $verifierMock = $this
+            ->getMockBuilder(ChainVerifier::class)
+            ->setConstructorArgs([[base64_decode(self::ROOT_CA_BASE64_ENCODED)]])
+            ->onlyMethods(["verifyChainWithoutCaching", "time"])
+            ->getMock();
+        $verifierMock
+            ->expects($this->exactly(2))
+            ->method("verifyChainWithoutCaching")
+            ->willReturn(
+                Certificate::fromDER(self::LEAF_CERT_BASE64_ENCODED, isBase64Encoded: true)->getOpenSSLPublicKey()
+            );
+        $verifierMock
+            ->method("time")
+            ->willReturnCallback(fn() => $this->time);
+
+        $this->time = self::CLOCK_DATE;
+        $verifierMock->verifyChain(
+            leafCertificate: Certificate::fromDER(self::LEAF_CERT_BASE64_ENCODED, isBase64Encoded: true),
+            intermediateCertificate: Certificate::fromDER(self::INTERMEDIATE_CA_BASE64_ENCODED, isBase64Encoded: true),
+            performOnlineChecks: true,
+            effectiveDate: (new DateTime())->setTimestamp(self::EFFECTIVE_DATE)
+        );
+
+        $this->time = self::CLOCK_DATE + 900; // 15 minutes
+        $verifierMock->verifyChain(
+            leafCertificate: Certificate::fromDER(self::LEAF_CERT_BASE64_ENCODED, isBase64Encoded: true),
+            intermediateCertificate: Certificate::fromDER(self::INTERMEDIATE_CA_BASE64_ENCODED, isBase64Encoded: true),
+            performOnlineChecks: true,
+            effectiveDate: (new DateTime())->setTimestamp(self::EFFECTIVE_DATE)
+        );
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testOcspResponseCachingWithDifferentChain(): void
+    {
+        $verifierMock = $this
+            ->getMockBuilder(ChainVerifier::class)
+            ->setConstructorArgs([[
+                base64_decode(self::ROOT_CA_BASE64_ENCODED),
+                base64_decode(self::REAL_APPLE_ROOT_BASE64_ENCODED),
+            ]])
+            ->onlyMethods(["verifyChainWithoutCaching"])
+            ->getMock();
+        $verifierMock
+            ->expects($this->exactly(2))
+            ->method("verifyChainWithoutCaching")
+            ->willReturn(
+                Certificate::fromDER(self::LEAF_CERT_BASE64_ENCODED, isBase64Encoded: true)->getOpenSSLPublicKey()
+            );
+
+        $verifierMock->verifyChain(
+            leafCertificate: Certificate::fromDER(self::LEAF_CERT_BASE64_ENCODED, isBase64Encoded: true),
+            intermediateCertificate: Certificate::fromDER(self::INTERMEDIATE_CA_BASE64_ENCODED, isBase64Encoded: true),
+            performOnlineChecks: true,
+            effectiveDate: (new DateTime())->setTimestamp(self::EFFECTIVE_DATE)
+        );
+        $verifierMock->verifyChain(
             leafCertificate: Certificate::fromDER(
                 self::REAL_APPLE_SIGNING_CERTIFICATE_BASE64_ENCODED,
                 isBase64Encoded: true

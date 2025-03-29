@@ -34,9 +34,14 @@ class ChainVerifier
     const APPLE_EXTENSION_MAC_APP_STORE_RECEIPT_SIGNING = "1.2.840.113635.100.6.11.1";
     const APPLE_EXTENSION_WWDR_INTERMEDIATE = "1.2.840.113635.100.6.2.1";
 
+    const MAXIMUM_CACHE_SIZE = 32; // There are unlikely to be more than a couple keys at once
+    const CACHE_TIME_LIMIT = 15 * 60; // 15 minutes
+
 
     /** @var Certificate[] */
     private readonly array $rootCertificates;
+    /** @var array<string, array{OpenSSLAsymmetricKey, int}> */
+    private array $verifiedCertificatesCache = [];
 
 
     /**
@@ -122,6 +127,45 @@ class ChainVerifier
      * @throws VerificationException
      */
     public function verifyChain(
+        Certificate $leafCertificate,
+        Certificate $intermediateCertificate,
+        bool $performOnlineChecks,
+        DateTime $effectiveDate
+    ): OpenSSLAsymmetricKey {
+        // check cache
+        if ($performOnlineChecks) {
+            $cachedPublicKey = $this->getCachedPublicKey(
+                leafCertificate: $leafCertificate,
+                intermediateCertificate: $intermediateCertificate
+            );
+            if ($cachedPublicKey !== null) {
+                return $cachedPublicKey;
+            }
+        }
+
+        $verifiedPublicKey = $this->verifyChainWithoutCaching(
+            leafCertificate: $leafCertificate,
+            intermediateCertificate: $intermediateCertificate,
+            performOnlineChecks: $performOnlineChecks,
+            effectiveDate: $effectiveDate
+        );
+
+        // add to cache
+        if ($performOnlineChecks) {
+            $this->putVerifiedPublicKey(
+                leafCertificate: $leafCertificate,
+                intermediateCertificate: $intermediateCertificate,
+                verifiedPublicKey: $verifiedPublicKey
+            );
+        }
+
+        return $verifiedPublicKey;
+    }
+
+    /**
+     * @throws VerificationException
+     */
+    public function verifyChainWithoutCaching(
         Certificate $leafCertificate,
         Certificate $intermediateCertificate,
         bool $performOnlineChecks,
@@ -265,5 +309,45 @@ class ChainVerifier
                 throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);
             }
         }
+    }
+
+    public function getCachedPublicKey(
+        Certificate $leafCertificate,
+        Certificate $intermediateCertificate
+    ): ?OpenSSLAsymmetricKey {
+        $cacheKey = $leafCertificate->getPem() . "-" . $intermediateCertificate->getPem();
+        $verifiedPublicKey = $this->verifiedCertificatesCache[$cacheKey] ?? null;
+        if ($verifiedPublicKey === null) {
+            return null;
+        }
+        $expiration = $verifiedPublicKey[1];
+        $time = $this->time();
+        if ($verifiedPublicKey[1] <= $this->time()) {
+            unset($this->verifiedCertificatesCache[$cacheKey]);
+            return null;
+        }
+        return $verifiedPublicKey[0];
+    }
+
+    public function putVerifiedPublicKey(
+        Certificate $leafCertificate,
+        Certificate $intermediateCertificate,
+        OpenSSLAsymmetricKey $verifiedPublicKey
+    ): void {
+        $cacheExpiration = $this->time() + self::CACHE_TIME_LIMIT;
+        $cacheKey = $leafCertificate->getPem() . "-" . $intermediateCertificate->getPem();
+        $this->verifiedCertificatesCache[$cacheKey] = [$verifiedPublicKey, $cacheExpiration];
+        if (count($this->verifiedCertificatesCache) > self::MAXIMUM_CACHE_SIZE) {
+            foreach ($this->verifiedCertificatesCache as $k => $v) {
+                if ($v[1] <= $this->time()) {
+                    unset($this->verifiedCertificatesCache[$k]);
+                }
+            }
+        }
+    }
+
+    public function time(): int
+    {
+        return time();
     }
 }
