@@ -296,6 +296,28 @@ enum APIError: int
     case APP_TRANSACTION_ID_NOT_SUPPORTED_ERROR = 4000048;
 
     /**
+     * An error that indicates the app account token value is not a valid UUID.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/invalidappaccounttokenuuiderror
+     */
+    case INVALID_APP_ACCOUNT_TOKEN_UUID_ERROR = 4000183;
+
+    /**
+     * An error that indicates the transaction is for a product the customer obtains through Family Sharing,
+     * which the endpoint doesn’t support.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/familytransactionnotsupportederror
+     */
+    case FAMILY_TRANSACTION_NOT_SUPPORTED_ERROR = 4000185;
+
+    /**
+     * An error that indicates the endpoint expects an original transaction identifier.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/transactionidisnotoriginaltransactioniderror
+     */
+    case TRANSACTION_ID_IS_NOT_ORIGINAL_TRANSACTION_ID_ERROR = 4000187;
+
+    /**
      * An error that indicates the subscription doesn't qualify for a renewal-date extension due to its subscription
      * state.
      *

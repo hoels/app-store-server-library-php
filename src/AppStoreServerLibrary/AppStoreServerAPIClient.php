@@ -22,6 +22,7 @@ use AppStoreServerLibrary\Models\Status;
 use AppStoreServerLibrary\Models\StatusResponse;
 use AppStoreServerLibrary\Models\TransactionHistoryRequest;
 use AppStoreServerLibrary\Models\TransactionInfoResponse;
+use AppStoreServerLibrary\Models\UpdateAppAccountTokenRequest;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -31,7 +32,7 @@ use ValueError;
 
 class AppStoreServerAPIClient
 {
-    const USER_AGENT = "app-store-server-library/php/1.7.0";
+    const USER_AGENT = "app-store-server-library/php/1.9.0";
     const PRODUCTION_URL = "https://api.storekit.itunes.apple.com";
     const LOCAL_TESTING_URL = "https://local-testing-base-url";
     const SANDBOX_URL = "https://api.storekit-sandbox.itunes.apple.com";
@@ -465,6 +466,29 @@ class AppStoreServerAPIClient
             method: "PUT",
             queryParameters: [],
             body: $consumptionRequest
+        );
+    }
+
+    /**
+     * Sets the app account token value for a purchase the customer makes outside your app, or updates its value in an
+     * existing transaction.
+     * https://developer.apple.com/documentation/appstoreserverapi/set-app-account-token
+     *
+     * @param string $originalTransactionId The original transaction identifier of the transaction to receive the app
+     * account token update.
+     * @param UpdateAppAccountTokenRequest $updateAppAccountTokenRequest The request body that contains a valid app
+     * account token value.
+     * @throws APIException If a response was returned indicating the request could not be processed
+     */
+    public function setAppAccountToken(
+        string $originalTransactionId,
+        UpdateAppAccountTokenRequest $updateAppAccountTokenRequest
+    ): void {
+        $this->makeRequest(
+            path: "/inApps/v1/transactions/" . $originalTransactionId . "/appAccountToken",
+            method: "PUT",
+            queryParameters: [],
+            body: $updateAppAccountTokenRequest
         );
     }
 }

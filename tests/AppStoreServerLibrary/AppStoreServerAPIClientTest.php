@@ -32,6 +32,7 @@ use AppStoreServerLibrary\Models\Subtype;
 use AppStoreServerLibrary\Models\TransactionHistoryRequest;
 use AppStoreServerLibrary\Models\TransactionHistoryRequest\Order;
 use AppStoreServerLibrary\Models\TransactionHistoryRequest\ProductType;
+use AppStoreServerLibrary\Models\UpdateAppAccountTokenRequest;
 use AppStoreServerLibrary\Models\UserStatus;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
@@ -705,6 +706,119 @@ class AppStoreServerAPIClientTest extends TestCase
         );
 
         self::assertNull($transactionHistoryResponse->getAppAppleId());
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testSetAppAccountToken(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "PUT",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/49571273/appAccountToken",
+            expectedParams: [],
+            expectedJson: ["appAccountToken" => "7389a31a-fb6d-4569-a2a6-db7d85d84813"]
+        );
+
+        $updateAppAccountTokenRequest = new UpdateAppAccountTokenRequest(
+            appAccountToken: "7389a31a-fb6d-4569-a2a6-db7d85d84813"
+        );
+
+        $client->setAppAccountToken(
+            originalTransactionId: "49571273",
+            updateAppAccountTokenRequest: $updateAppAccountTokenRequest
+        );
+    }
+
+    public function testInvalidAppAccountTokenError(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/invalidAppAccountTokenUUIDError.json",
+            expectedMethod: "PUT",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/49571273/appAccountToken",
+            expectedParams: [],
+            expectedJson: ["appAccountToken" => ""],
+            statusCode: 400
+        );
+
+        try {
+            $updateAppAccountTokenRequest = new UpdateAppAccountTokenRequest(appAccountToken: "");
+            $client->setAppAccountToken(
+                originalTransactionId: "49571273",
+                updateAppAccountTokenRequest: $updateAppAccountTokenRequest
+            );
+        } catch (APIException $e) {
+            self::assertEquals(400, $e->getHttpStatusCode());
+            self::assertEquals(APIError::INVALID_APP_ACCOUNT_TOKEN_UUID_ERROR, $e->getApiError());
+            self::assertEquals(
+                "Invalid request. The app account token field must be a valid UUID.",
+                $e->getErrorMessage()
+            );
+            return;
+        }
+
+        self::fail("Expected client to throw APIException.");
+    }
+
+    public function testFamilyTransactionNotSupportedError(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/familyTransactionNotSupportedError.json",
+            expectedMethod: "PUT",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/1234/appAccountToken",
+            expectedParams: [],
+            expectedJson: ["appAccountToken" => ""],
+            statusCode: 400
+        );
+
+        try {
+            $updateAppAccountTokenRequest = new UpdateAppAccountTokenRequest(appAccountToken: "");
+            $client->setAppAccountToken(
+                originalTransactionId: "1234",
+                updateAppAccountTokenRequest: $updateAppAccountTokenRequest
+            );
+        } catch (APIException $e) {
+            self::assertEquals(400, $e->getHttpStatusCode());
+            self::assertEquals(APIError::FAMILY_TRANSACTION_NOT_SUPPORTED_ERROR, $e->getApiError());
+            self::assertEquals(
+                "Invalid request. Family Sharing transactions aren't supported by this endpoint.",
+                $e->getErrorMessage()
+            );
+            return;
+        }
+
+        self::fail("Expected client to throw APIException.");
+    }
+
+    public function testTransactionIdNotOriginalTransactionIdError(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/transactionIdNotOriginalTransactionId.json",
+            expectedMethod: "PUT",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/1234/appAccountToken",
+            expectedParams: [],
+            expectedJson: ["appAccountToken" => ""],
+            statusCode: 400
+        );
+
+        try {
+            $updateAppAccountTokenRequest = new UpdateAppAccountTokenRequest(appAccountToken: "");
+            $client->setAppAccountToken(
+                originalTransactionId: "1234",
+                updateAppAccountTokenRequest: $updateAppAccountTokenRequest
+            );
+        } catch (APIException $e) {
+            self::assertEquals(400, $e->getHttpStatusCode());
+            self::assertEquals(APIError::TRANSACTION_ID_IS_NOT_ORIGINAL_TRANSACTION_ID_ERROR, $e->getApiError());
+            self::assertEquals(
+                "Invalid request. The transaction ID provided is not an original transaction ID.",
+                $e->getErrorMessage()
+            );
+            return;
+        }
+
+        self::fail("Expected client to throw APIException.");
     }
 
     private function getSigningKey(): string
