@@ -121,9 +121,9 @@ class AppStoreServerAPIClient
                 uri: $uri,
                 options: $options
             );
-        } catch (GuzzleException) {
+        } catch (GuzzleException $exception) {
             // may occur when no connection can be established
-            throw new APIException(httpStatusCode: 0);
+            throw new APIException(httpStatusCode: 0, errorMessage: $exception->getMessage());
         }
 
         if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {

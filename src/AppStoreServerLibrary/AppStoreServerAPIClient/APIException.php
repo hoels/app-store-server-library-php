@@ -18,7 +18,7 @@ class APIException extends Exception
         parent::__construct(code: $httpStatusCode);
         $this->httpStatusCode = $httpStatusCode;
         $this->apiError = $rawApiError === null ? null : APIError::tryFrom($rawApiError);
-        $this->errorMessage = $errorMessage;
+        $this->errorMessage = $this->message = $errorMessage;
     }
 
     public function getHttpStatusCode(): int
