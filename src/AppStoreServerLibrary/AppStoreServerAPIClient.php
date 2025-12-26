@@ -98,7 +98,7 @@ class AppStoreServerAPIClient
             "Accept" => "application/json",
         ];
 
-        $options = [RequestOptions::HEADERS => $headers];
+        $options = [RequestOptions::HEADERS => $headers, RequestOptions::HTTP_ERRORS => false];
         if ($body !== null) {
             $options[RequestOptions::JSON] = $body->jsonSerialize();
         }
