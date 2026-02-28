@@ -98,7 +98,7 @@ class AppStoreServerAPIClient
             "Accept" => "application/json",
         ];
 
-        $options = [RequestOptions::HEADERS => $headers];
+        $options = [RequestOptions::HEADERS => $headers, RequestOptions::HTTP_ERRORS => false];
         if ($body !== null) {
             $options[RequestOptions::JSON] = $body->jsonSerialize();
         }
@@ -121,9 +121,9 @@ class AppStoreServerAPIClient
                 uri: $uri,
                 options: $options
             );
-        } catch (GuzzleException) {
+        } catch (GuzzleException $exception) {
             // may occur when no connection can be established
-            throw new APIException(httpStatusCode: 0);
+            throw new APIException(httpStatusCode: 0, errorMessage: $exception->getMessage());
         }
 
         if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
