@@ -121,7 +121,7 @@ class JWSRenewalInfoDecodedPayload
     }
 
     /**
-     * The type of the subscription offer.
+     * The type of offer.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/offertype
      */
@@ -131,7 +131,7 @@ class JWSRenewalInfoDecodedPayload
     }
 
     /**
-     * The identifier that contains the promo code or the promotional offer identifier.
+     * The offer code or the promotional offer identifier.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/offeridentifier
      */
@@ -202,7 +202,7 @@ class JWSRenewalInfoDecodedPayload
     }
 
     /**
-     * The payment mode of the discount offer.
+     * The payment mode you configure for the offer.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/offerdiscounttype
      */
