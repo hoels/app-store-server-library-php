@@ -105,6 +105,10 @@ class SignedDataVerifier
             } else {
                 $environment = Environment::PRODUCTION;
             }
+        } elseif (($appData = $decodedSignedNotification->getAppData()) !== null) {
+            $bundleId = $appData->getBundleId();
+            $appAppleId = $appData->getAppAppleId();
+            $environment = $appData->getEnvironment();
         }
 
         $this->verifyNotification(bundleId: $bundleId, appAppleId: $appAppleId, environment: $environment);

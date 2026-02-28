@@ -1,0 +1,18 @@
+<?php
+
+namespace AppStoreServerLibrary\Models;
+
+/**
+ * A value that indicates your preferred outcome for the refund request.
+ *
+ * https://developer.apple.com/documentation/appstoreserverapi/refundpreferencev1
+ *
+ * @deprecated Use {@see RefundPreference} instead.
+ */
+enum RefundPreferenceV1: int
+{
+    case UNDECLARED = 0;
+    case PREFER_GRANT = 1;
+    case PREFER_DECLINE = 2;
+    case NO_PREFERENCE = 3;
+}

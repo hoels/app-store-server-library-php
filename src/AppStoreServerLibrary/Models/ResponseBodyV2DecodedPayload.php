@@ -17,6 +17,7 @@ class ResponseBodyV2DecodedPayload
         private readonly ?Data $data,
         private readonly ?Summary $summary,
         private readonly ?ExternalPurchaseToken $externalPurchaseToken,
+        private readonly ?AppData $appData,
         private readonly ?string $version,
         private readonly ?int $signedDate,
         private readonly ?string $notificationUUID,
@@ -82,6 +83,17 @@ class ResponseBodyV2DecodedPayload
     }
 
     /**
+     * The object that contains the app metadata and signed app transaction information. This field appears when the
+     * notificationType is RESCIND_CONSENT.
+     *
+     * https://developer.apple.com/documentation/appstoreservernotifications/appdata
+     */
+    public function getAppData(): ?AppData
+    {
+        return $this->appData;
+    }
+
+    /**
      * A string that indicates the notification's App Store Server Notifications version number.
      *
      * https://developer.apple.com/documentation/appstoreservernotifications/version
@@ -125,6 +137,9 @@ class ResponseBodyV2DecodedPayload
             externalPurchaseToken: property_exists($obj, "externalPurchaseToken")
                 && ($obj->externalPurchaseToken instanceof stdClass || is_array($obj->externalPurchaseToken))
                 ? ExternalPurchaseToken::fromObject((object)$obj->externalPurchaseToken) : null,
+            appData: property_exists($obj, "appData")
+                && ($obj->appData instanceof stdClass || is_array($obj->appData))
+                ? AppData::fromObject((object)$obj->appData) : null,
             version: property_exists($obj, "version") && is_string($obj->version)
                 ? $obj->version : null,
             signedDate: property_exists($obj, "signedDate")

@@ -6,6 +6,7 @@ use AppStoreServerLibrary\AppStoreServerAPIClient\APIException;
 use AppStoreServerLibrary\AppStoreServerAPIClient\GetTransactionHistoryVersion;
 use AppStoreServerLibrary\Models\CheckTestNotificationResponse;
 use AppStoreServerLibrary\Models\ConsumptionRequest;
+use AppStoreServerLibrary\Models\ConsumptionRequestV1;
 use AppStoreServerLibrary\Models\Environment;
 use AppStoreServerLibrary\Models\ExtendRenewalDateRequest;
 use AppStoreServerLibrary\Models\ExtendRenewalDateResponse;
@@ -185,7 +186,7 @@ class AppStoreServerAPIClient
         ExtendRenewalDateRequest $extendRenewalDateRequest
     ): ExtendRenewalDateResponse {
         $responseBody = $this->makeRequest(
-            path: "/inApps/v1/subscriptions/extend/" . $originalTransactionId,
+            path: "/inApps/v1/subscriptions/extend/$originalTransactionId",
             method: "PUT",
             queryParameters: [],
             body: $extendRenewalDateRequest
@@ -213,7 +214,7 @@ class AppStoreServerAPIClient
         }
 
         $responseBody = $this->makeRequest(
-            path: "/inApps/v1/subscriptions/" . $transactionId,
+            path: "/inApps/v1/subscriptions/$transactionId",
             method: "GET",
             queryParameters: $queryParameters,
             body: null
@@ -241,7 +242,7 @@ class AppStoreServerAPIClient
         }
 
         $responseBody = $this->makeRequest(
-            path: "/inApps/v2/refund/lookup/" . $transactionId,
+            path: "/inApps/v2/refund/lookup/$transactionId",
             method: "GET",
             queryParameters: $queryParameters,
             body: null
@@ -267,7 +268,7 @@ class AppStoreServerAPIClient
         string $productId
     ): MassExtendRenewalDateStatusResponse {
         $responseBody = $this->makeRequest(
-            path: "/inApps/v1/subscriptions/extend/mass/" . $productId . "/" . $requestIdentifier,
+            path: "/inApps/v1/subscriptions/extend/mass/$productId/$requestIdentifier",
             method: "GET",
             queryParameters: [],
             body: null
@@ -288,7 +289,7 @@ class AppStoreServerAPIClient
     public function getTestNotificationStatus(string $testNotificationToken): CheckTestNotificationResponse
     {
         $responseBody = $this->makeRequest(
-            path: "/inApps/v1/notifications/test/" . $testNotificationToken,
+            path: "/inApps/v1/notifications/test/$testNotificationToken",
             method: "GET",
             queryParameters: [],
             body: null
@@ -383,7 +384,7 @@ class AppStoreServerAPIClient
         }
 
         $responseBody = $this->makeRequest(
-            path: "/inApps/" . $version->value . "/history/" . $transactionId,
+            path: "/inApps/{$version->value}/history/$transactionId",
             method: "GET",
             queryParameters: $queryParameters,
             body: null
@@ -403,7 +404,7 @@ class AppStoreServerAPIClient
     public function getTransactionInfo(string $transactionId): TransactionInfoResponse
     {
         $responseBody = $this->makeRequest(
-            path: "/inApps/v1/transactions/" . $transactionId,
+            path: "/inApps/v1/transactions/$transactionId",
             method: "GET",
             queryParameters: [],
             body: null
@@ -423,7 +424,7 @@ class AppStoreServerAPIClient
     public function lookUpOrderId(string $orderId): OrderLookupResponse
     {
         $responseBody = $this->makeRequest(
-            path: "/inApps/v1/lookup/" . $orderId,
+            path: "/inApps/v1/lookup/$orderId",
             method: "GET",
             queryParameters: [],
             body: null
@@ -452,17 +453,40 @@ class AppStoreServerAPIClient
     /**
      * Send consumption information about a consumable in-app purchase to the App Store after your server receives a
      * consumption request notification.
-     * https://developer.apple.com/documentation/appstoreserverapi/send_consumption_information
+     * https://developer.apple.com/documentation/appstoreserverapi/send-consumption-information-v1
      *
      * @param string $transactionId The transaction identifier for which you're providing consumption information. You
      * receive this identifier in the CONSUMPTION_REQUEST notification the App Store sends to your server.
+     * @param ConsumptionRequestV1 $consumptionRequest The request body containing consumption information.
+     * @throws APIException If a response was returned indicating the request could not be processed
+     *
+     * @deprecated Use {@see sendConsumptionInformation} instead.
+     */
+    public function sendConsumptionData(string $transactionId, ConsumptionRequestV1 $consumptionRequest): void
+    {
+        $this->makeRequest(
+            path: "/inApps/v1/transactions/consumption/$transactionId",
+            method: "PUT",
+            queryParameters: [],
+            body: $consumptionRequest
+        );
+    }
+
+    /**
+     * Send consumption information about an In-App Purchase to the App Store after your server receives a consumption
+     * request notification.
+     * https://developer.apple.com/documentation/appstoreserverapi/send-consumption-information
+     *
+     * @param string $transactionId The transaction identifier for which you're providing consumption information. You
+     * receive this identifier in the CONSUMPTION_REQUEST notification the App Store sends to your server's App Store
+     * Server Notifications V2 endpoint.
      * @param ConsumptionRequest $consumptionRequest The request body containing consumption information.
      * @throws APIException If a response was returned indicating the request could not be processed
      */
-    public function sendConsumptionData(string $transactionId, ConsumptionRequest $consumptionRequest): void
+    public function sendConsumptionInformation(string $transactionId, ConsumptionRequest $consumptionRequest): void
     {
         $this->makeRequest(
-            path: "/inApps/v1/transactions/consumption/" . $transactionId,
+            path: "/inApps/v2/transactions/consumption/$transactionId",
             method: "PUT",
             queryParameters: [],
             body: $consumptionRequest
@@ -485,7 +509,7 @@ class AppStoreServerAPIClient
         UpdateAppAccountTokenRequest $updateAppAccountTokenRequest
     ): void {
         $this->makeRequest(
-            path: "/inApps/v1/transactions/" . $originalTransactionId . "/appAccountToken",
+            path: "/inApps/v1/transactions/$originalTransactionId/appAccountToken",
             method: "PUT",
             queryParameters: [],
             body: $updateAppAccountTokenRequest

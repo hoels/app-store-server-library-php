@@ -40,6 +40,8 @@ class JWSTransactionDecodedPayload
         private readonly ?OfferDiscountType $offerDiscountType,
         private readonly ?string $appTransactionId,
         private readonly ?string $offerPeriod,
+        private readonly ?RevocationType $revocationType,
+        private readonly ?int $revocationPercentage,
     ) {
     }
 
@@ -330,6 +332,26 @@ class JWSTransactionDecodedPayload
         return $this->offerPeriod;
     }
 
+    /**
+     * The type of the refund or revocation that applies to the transaction.
+     *
+     * https://developer.apple.com/documentation/appstoreservernotifications/revocationtype
+     */
+    public function getRevocationType(): ?RevocationType
+    {
+        return $this->revocationType;
+    }
+
+    /**
+     * The percentage, in milliunits, of the transaction that the App Store has refunded or revoked.
+     *
+     * https://developer.apple.com/documentation/appstoreservernotifications/revocationpercentage
+     */
+    public function getRevocationPercentage(): ?int
+    {
+        return $this->revocationPercentage;
+    }
+
     public static function fromObject(stdClass $obj): JWSTransactionDecodedPayload
     {
         return new JWSTransactionDecodedPayload(
@@ -396,6 +418,11 @@ class JWSTransactionDecodedPayload
                 ? $obj->appTransactionId : null,
             offerPeriod: property_exists($obj, "offerPeriod") && is_string($obj->offerPeriod)
                 ? $obj->offerPeriod : null,
+            revocationType: property_exists($obj, "revocationType") && is_string($obj->revocationType)
+                ? RevocationType::tryFrom($obj->revocationType) : null,
+            revocationPercentage: property_exists($obj, "revocationPercentage")
+                && is_int($obj->revocationPercentage)
+                ? $obj->revocationPercentage : null,
         );
     }
 }

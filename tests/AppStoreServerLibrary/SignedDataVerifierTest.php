@@ -13,6 +13,7 @@ use AppStoreServerLibrary\Models\OfferType;
 use AppStoreServerLibrary\Models\PriceIncreaseStatus;
 use AppStoreServerLibrary\Models\PurchasePlatform;
 use AppStoreServerLibrary\Models\RevocationReason;
+use AppStoreServerLibrary\Models\RevocationType;
 use AppStoreServerLibrary\Models\Status;
 use AppStoreServerLibrary\Models\Subtype;
 use AppStoreServerLibrary\Models\TransactionReason;
@@ -100,6 +101,49 @@ class SignedDataVerifierTest extends TestCase
     /**
      * @throws VerificationException
      */
+    public function testSelfSignedTransactionWithRevocationDecoding(): void
+    {
+        $signedTransaction = $this->createSignedDataFromJson(
+            path: __DIR__ . "/resources/models/signedTransactionWithRevocation.json"
+        );
+        $signedDataVerifier = $this->getDefaultSignedDataVerifier();
+
+        $transaction = $signedDataVerifier->verifyAndDecodeSignedTransaction($signedTransaction);
+        self::assertEquals("12345", $transaction->getOriginalTransactionId());
+        self::assertEquals("23456", $transaction->getTransactionId());
+        self::assertEquals("34343", $transaction->getWebOrderLineItemId());
+        self::assertEquals("com.example", $transaction->getBundleId());
+        self::assertEquals("com.example.product", $transaction->getProductId());
+        self::assertEquals("55555", $transaction->getSubscriptionGroupIdentifier());
+        self::assertEquals(1698148800000, $transaction->getOriginalPurchaseDate());
+        self::assertEquals(1698148900000, $transaction->getPurchaseDate());
+        self::assertEquals(1698148950000, $transaction->getRevocationDate());
+        self::assertEquals(1698149000000, $transaction->getExpiresDate());
+        self::assertEquals(1, $transaction->getQuantity());
+        self::assertEquals(Type::AUTO_RENEWABLE_SUBSCRIPTION, $transaction->getType());
+        self::assertEquals("7e3fb20b-4cdb-47cc-936d-99d65f608138", $transaction->getAppAccountToken());
+        self::assertEquals(InAppOwnershipType::PURCHASED, $transaction->getInAppOwnershipType());
+        self::assertEquals(1698148900000, $transaction->getSignedDate());
+        self::assertEquals(RevocationReason::REFUNDED_DUE_TO_ISSUE, $transaction->getRevocationReason());
+        self::assertEquals("abc.123", $transaction->getOfferIdentifier());
+        self::assertTrue($transaction->getIsUpgraded());
+        self::assertEquals(OfferType::INTRODUCTORY_OFFER, $transaction->getOfferType());
+        self::assertEquals("USA", $transaction->getStorefront());
+        self::assertEquals("143441", $transaction->getStorefrontId());
+        self::assertEquals(TransactionReason::PURCHASE, $transaction->getTransactionReason());
+        self::assertEquals(Environment::LOCAL_TESTING, $transaction->getEnvironment());
+        self::assertEquals(10990, $transaction->getPrice());
+        self::assertEquals("USD", $transaction->getCurrency());
+        self::assertEquals(OfferDiscountType::PAY_AS_YOU_GO, $transaction->getOfferDiscountType());
+        self::assertEquals("71134", $transaction->getAppTransactionId());
+        self::assertEquals("P1Y", $transaction->getOfferPeriod());
+        self::assertEquals(RevocationType::REFUND_PRORATED, $transaction->getRevocationType());
+        self::assertEquals(50000, $transaction->getRevocationPercentage());
+    }
+
+    /**
+     * @throws VerificationException
+     */
     public function testSelfSignedRenewalInfoDecoding(): void
     {
         $signedRenewalInfo = $this->createSignedDataFromJson(
@@ -150,6 +194,7 @@ class SignedDataVerifierTest extends TestCase
         self::assertNotNull($notification->getData());
         self::assertNull($notification->getSummary());
         self::assertNull($notification->getExternalPurchaseToken());
+        self::assertNull($notification->getAppData());
         self::assertEquals(Environment::LOCAL_TESTING, $notification->getData()->getEnvironment());
         self::assertEquals(41234, $notification->getData()->getAppAppleId());
         self::assertEquals("com.example", $notification->getData()->getBundleId());
@@ -179,6 +224,7 @@ class SignedDataVerifierTest extends TestCase
         self::assertNotNull($notification->getData());
         self::assertNull($notification->getSummary());
         self::assertNull($notification->getExternalPurchaseToken());
+        self::assertNull($notification->getAppData());
         self::assertEquals(Environment::LOCAL_TESTING, $notification->getData()->getEnvironment());
         self::assertEquals(41234, $notification->getData()->getAppAppleId());
         self::assertEquals("com.example", $notification->getData()->getBundleId());
@@ -197,12 +243,12 @@ class SignedDataVerifierTest extends TestCase
      */
     public function testSelfSignedSummaryNotificationDecoding(): void
     {
-        $signedSummaryNotification = $this->createSignedDataFromJson(
+        $signedNotification = $this->createSignedDataFromJson(
             path: __DIR__ . "/resources/models/signedSummaryNotification.json"
         );
         $signedDataVerifier = $this->getDefaultSignedDataVerifier();
 
-        $notification = $signedDataVerifier->verifyAndDecodeNotification($signedSummaryNotification);
+        $notification = $signedDataVerifier->verifyAndDecodeNotification($signedNotification);
         self::assertEquals(NotificationTypeV2::RENEWAL_EXTENSION, $notification->getNotificationType());
         self::assertEquals(Subtype::SUMMARY, $notification->getSubtype());
         self::assertEquals("002e14d5-51f5-4503-b5a8-c3a1af68eb20", $notification->getNotificationUUID());
@@ -211,6 +257,7 @@ class SignedDataVerifierTest extends TestCase
         self::assertNull($notification->getData());
         self::assertNotNull($notification->getSummary());
         self::assertNull($notification->getExternalPurchaseToken());
+        self::assertNull($notification->getAppData());
         self::assertEquals(Environment::LOCAL_TESTING, $notification->getSummary()->getEnvironment());
         self::assertEquals(41234, $notification->getSummary()->getAppAppleId());
         self::assertEquals("com.example", $notification->getSummary()->getBundleId());
@@ -222,16 +269,45 @@ class SignedDataVerifierTest extends TestCase
     }
 
     /**
+     * @throws VerificationException
+     */
+    public function testSignedRescindConsentNotificationDecoding(): void
+    {
+        $signedNotification = $this->createSignedDataFromJson(
+            path: __DIR__ . "/resources/models/signedRescindConsentNotification.json"
+        );
+        $signedDataVerifierMock = $this->getDefaultSignedDataVerifier();
+
+        $notification = $signedDataVerifierMock->verifyAndDecodeNotification($signedNotification);
+        self::assertEquals(NotificationTypeV2::RESCIND_CONSENT, $notification->getNotificationType());
+        self::assertNull($notification->getSubtype());
+        self::assertEquals("002e14d5-51f5-4503-b5a8-c3a1af68eb20", $notification->getNotificationUUID());
+        self::assertEquals("2.0", $notification->getVersion());
+        self::assertEquals(1698148900000, $notification->getSignedDate());
+        self::assertNull($notification->getData());
+        self::assertNull($notification->getSummary());
+        self::assertNull($notification->getExternalPurchaseToken());
+        self::assertNotNull($notification->getAppData());
+        self::assertEquals(Environment::LOCAL_TESTING, $notification->getAppData()->getEnvironment());
+        self::assertEquals(41234, $notification->getAppData()->getAppAppleId());
+        self::assertEquals("com.example", $notification->getAppData()->getBundleId());
+        self::assertEquals(
+            "signed_app_transaction_info_value",
+            $notification->getAppData()->getSignedAppTransactionInfo()
+        );
+    }
+
+    /**
      * @throws Exception|VerificationException
      */
     public function testSelfSignedExternalPurchaseTokenNotificationDecoding(): void
     {
-        $signedSummaryNotification = $this->createSignedDataFromJson(
+        $signedNotification = $this->createSignedDataFromJson(
             path: __DIR__ . "/resources/models/signedExternalPurchaseTokenNotification.json"
         );
         $signedDataVerifierMock = $this->getMockedSignedDataVerifier(environment: Environment::PRODUCTION);
 
-        $notification = $signedDataVerifierMock->verifyAndDecodeNotification($signedSummaryNotification);
+        $notification = $signedDataVerifierMock->verifyAndDecodeNotification($signedNotification);
         self::assertEquals(NotificationTypeV2::EXTERNAL_PURCHASE_TOKEN, $notification->getNotificationType());
         self::assertEquals(Subtype::UNREPORTED, $notification->getSubtype());
         self::assertEquals("002e14d5-51f5-4503-b5a8-c3a1af68eb20", $notification->getNotificationUUID());
@@ -254,12 +330,12 @@ class SignedDataVerifierTest extends TestCase
      */
     public function testSelfSignedExternalPurchaseTokenSandboxNotificationDecoding(): void
     {
-        $signedSummaryNotification = $this->createSignedDataFromJson(
+        $signedNotification = $this->createSignedDataFromJson(
             path: __DIR__ . "/resources/models/signedExternalPurchaseTokenSandboxNotification.json"
         );
         $signedDataVerifierMock = $this->getMockedSignedDataVerifier(environment: Environment::SANDBOX);
 
-        $signedDataVerifierMock->verifyAndDecodeNotification($signedSummaryNotification);
+        $signedDataVerifierMock->verifyAndDecodeNotification($signedNotification);
     }
 
     /**

@@ -13,17 +13,10 @@ class ConsumptionRequest implements JsonSerializable
 {
     public function __construct(
         private readonly bool $customerConsented,
-        private readonly ConsumptionStatus $consumptionStatus,
-        private readonly Platform $platform,
         private readonly bool $sampleContentProvided,
         private readonly DeliveryStatus $deliveryStatus,
-        private readonly string $appAccountToken,
-        private readonly AccountTenure $accountTenure,
-        private readonly PlayTime $playTime,
-        private readonly LifetimeDollarsRefunded $lifetimeDollarsRefunded,
-        private readonly LifetimeDollarsPurchased $lifetimeDollarsPurchased,
-        private readonly UserStatus $userStatus,
-        private readonly RefundPreference $refundPreference,
+        private readonly ?int $consumptionPercentage,
+        private readonly ?RefundPreference $refundPreference,
     ) {
     }
 
@@ -35,26 +28,6 @@ class ConsumptionRequest implements JsonSerializable
     public function getCustomerConsented(): bool
     {
         return $this->customerConsented;
-    }
-
-    /**
-     * A value that indicates the extent to which the customer consumed the in-app purchase.
-     *
-     * https://developer.apple.com/documentation/appstoreserverapi/consumptionstatus
-     */
-    public function getConsumptionStatus(): ConsumptionStatus
-    {
-        return $this->consumptionStatus;
-    }
-
-    /**
-     * A value that indicates the platform on which the customer consumed the in-app purchase.
-     *
-     * https://developer.apple.com/documentation/appstoreserverapi/platform
-     */
-    public function getPlatform(): Platform
-    {
-        return $this->platform;
     }
 
     /**
@@ -79,75 +52,21 @@ class ConsumptionRequest implements JsonSerializable
     }
 
     /**
-     * The UUID that an app optionally generates to map a customer's in-app purchase with its resulting App Store
-     * transaction.
+     * An integer that indicates the percentage, in milliunits, of the In-App Purchase the customer consumed.
      *
-     * https://developer.apple.com/documentation/appstoreserverapi/appaccounttoken
+     * https://developer.apple.com/documentation/appstoreserverapi/consumptionpercentage
      */
-    public function getAppAccountToken(): string
+    public function getConsumptionPercentage(): ?int
     {
-        return $this->appAccountToken;
+        return $this->consumptionPercentage;
     }
 
     /**
-     * The age of the customer's account.
-     *
-     * https://developer.apple.com/documentation/appstoreserverapi/accounttenure
-     */
-    public function getAccountTenure(): AccountTenure
-    {
-        return $this->accountTenure;
-    }
-
-    /**
-     * A value that indicates the amount of time that the customer used the app.
-     *
-     * https://developer.apple.com/documentation/appstoreserverapi/consumptionrequest
-     */
-    public function getPlayTime(): PlayTime
-    {
-        return $this->playTime;
-    }
-
-    /**
-     * A value that indicates the total amount, in USD, of refunds the customer has received, in your app, across all
-     * platforms.
-     *
-     * https://developer.apple.com/documentation/appstoreserverapi/lifetimedollarsrefunded
-     */
-    public function getLifetimeDollarsRefunded(): LifetimeDollarsRefunded
-    {
-        return $this->lifetimeDollarsRefunded;
-    }
-
-    /**
-     * A value that indicates the total amount, in USD, of in-app purchases the customer has made in your app, across
-     * all platforms.
-     *
-     * https://developer.apple.com/documentation/appstoreserverapi/lifetimedollarspurchased
-     */
-    public function getLifetimeDollarsPurchased(): LifetimeDollarsPurchased
-    {
-        return $this->lifetimeDollarsPurchased;
-    }
-
-    /**
-     * The status of the customer's account.
-     *
-     * https://developer.apple.com/documentation/appstoreserverapi/userstatus
-     */
-    public function getUserStatus(): UserStatus
-    {
-        return $this->userStatus;
-    }
-
-    /**
-     * A value that indicates your preference, based on your operational logic, as to whether Apple should grant the
-     * refund.
+     * A value that indicates your preferred outcome for the refund request.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/refundpreference
      */
-    public function getRefundPreference(): RefundPreference
+    public function getRefundPreference(): ?RefundPreference
     {
         return $this->refundPreference;
     }

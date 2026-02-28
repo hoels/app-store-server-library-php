@@ -7,10 +7,9 @@ namespace AppStoreServerLibrary\Models;
  *
  * https://developer.apple.com/documentation/appstoreserverapi/refundpreference
  */
-enum RefundPreference: int
+enum RefundPreference: string
 {
-    case UNDECLARED = 0;
-    case PREFER_GRANT = 1;
-    case PREFER_DECLINE = 2;
-    case NO_PREFERENCE = 3;
+    case DECLINE = "DECLINE";
+    case GRANT_FULL = "GRANT_FULL";
+    case GRANT_PRORATED = "GRANT_PRORATED";
 }

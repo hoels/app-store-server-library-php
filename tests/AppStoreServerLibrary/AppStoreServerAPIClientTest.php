@@ -7,8 +7,10 @@ use AppStoreServerLibrary\AppStoreServerAPIClient\APIError;
 use AppStoreServerLibrary\AppStoreServerAPIClient\APIException;
 use AppStoreServerLibrary\Models\AccountTenure;
 use AppStoreServerLibrary\Models\ConsumptionRequest;
+use AppStoreServerLibrary\Models\ConsumptionRequestV1;
 use AppStoreServerLibrary\Models\ConsumptionStatus;
 use AppStoreServerLibrary\Models\DeliveryStatus;
+use AppStoreServerLibrary\Models\DeliveryStatusV1;
 use AppStoreServerLibrary\Models\Environment;
 use AppStoreServerLibrary\Models\ExtendReasonCode;
 use AppStoreServerLibrary\Models\ExtendRenewalDateRequest;
@@ -24,6 +26,7 @@ use AppStoreServerLibrary\Models\OrderLookupStatus;
 use AppStoreServerLibrary\Models\Platform;
 use AppStoreServerLibrary\Models\PlayTime;
 use AppStoreServerLibrary\Models\RefundPreference;
+use AppStoreServerLibrary\Models\RefundPreferenceV1;
 use AppStoreServerLibrary\Models\SendAttemptItem;
 use AppStoreServerLibrary\Models\SendAttemptResult;
 use AppStoreServerLibrary\Models\Status;
@@ -513,12 +516,12 @@ class AppStoreServerAPIClientTest extends TestCase
             ]
         );
 
-        $consumptionRequest = new ConsumptionRequest(
+        $consumptionRequest = new ConsumptionRequestV1(
             customerConsented: true,
             consumptionStatus: ConsumptionStatus::NOT_CONSUMED,
             platform: Platform::NON_APPLE,
             sampleContentProvided: false,
-            deliveryStatus: DeliveryStatus::DID_NOT_DELIVER_DUE_TO_SERVER_OUTAGE,
+            deliveryStatus: DeliveryStatusV1::DID_NOT_DELIVER_DUE_TO_SERVER_OUTAGE,
             appAccountToken: '7389a31a-fb6d-4569-a2a6-db7d85d84813',
             accountTenure: AccountTenure::THIRTY_DAYS_TO_NINETY_DAYS,
             playTime: PlayTime::ONE_DAY_TO_FOUR_DAYS,
@@ -526,10 +529,43 @@ class AppStoreServerAPIClientTest extends TestCase
                 ONE_THOUSAND_DOLLARS_TO_ONE_THOUSAND_NINE_HUNDRED_NINETY_NINE_DOLLARS_AND_NINETY_NINE_CENTS,
             lifetimeDollarsPurchased: LifetimeDollarsPurchased::TWO_THOUSAND_DOLLARS_OR_GREATER,
             userStatus: UserStatus::LIMITED_ACCESS,
-            refundPreference: RefundPreference::NO_PREFERENCE
+            refundPreference: RefundPreferenceV1::NO_PREFERENCE
         );
 
         $client->sendConsumptionData(
+            transactionId: "49571273",
+            consumptionRequest: $consumptionRequest
+        );
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testSendConsumptionInformation(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "PUT",
+            expectedUrl: "https://local-testing-base-url/inApps/v2/transactions/consumption/49571273",
+            expectedParams: [],
+            expectedJson: [
+                "customerConsented" => true,
+                "sampleContentProvided" => false,
+                "deliveryStatus" => "DELIVERED",
+                "consumptionPercentage" => 50000,
+                "refundPreference" => "GRANT_FULL",
+            ]
+        );
+
+        $consumptionRequest = new ConsumptionRequest(
+            customerConsented: true,
+            sampleContentProvided: false,
+            deliveryStatus: DeliveryStatus::DELIVERED,
+            consumptionPercentage: 50000,
+            refundPreference: RefundPreference::GRANT_FULL,
+        );
+
+        $client->sendConsumptionInformation(
             transactionId: "49571273",
             consumptionRequest: $consumptionRequest
         );

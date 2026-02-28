@@ -296,6 +296,41 @@ enum APIError: int
     case APP_TRANSACTION_ID_NOT_SUPPORTED_ERROR = 4000048;
 
     /**
+     * An error that indicates the image that's uploading is invalid.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/invalidimageerror
+     */
+    const INVALID_IMAGE = 4000161;
+
+    /**
+     * An error that indicates the header text is too long.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/headertoolongerror
+     */
+    const HEADER_TOO_LONG = 4000162;
+
+    /**
+     * An error that indicates the body text is too long.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/bodytoolongerror
+     */
+    const BODY_TOO_LONG = 4000163;
+
+    /**
+     * An error that indicates the locale is invalid.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/invalidlocaleerror
+     */
+    const INVALID_LOCALE = 4000164;
+
+    /**
+     * An error that indicates the alternative text for an image is too long.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/alttexttoolongerror
+     */
+    const ALT_TEXT_TOO_LONG = 4000175;
+
+    /**
      * An error that indicates the app account token value is not a valid UUID.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/invalidappaccounttokenuuiderror
@@ -340,6 +375,42 @@ enum APIError: int
      * https://developer.apple.com/documentation/appstoreserverapi/familysharedsubscriptionextensionineligibleerror
      */
     case FAMILY_SHARED_SUBSCRIPTION_EXTENSION_INELIGIBLE = 4030007;
+
+    /**
+     * An error that indicates when you reach the maximum number of uploaded images.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/maximumnumberofimagesreachederror
+     */
+    const MAXIMUM_NUMBER_OF_IMAGES_REACHED = 4030014;
+
+    /**
+     * An error that indicates when you reach the maximum number of uploaded messages.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/maximumnumberofmessagesreachederror
+     */
+    const MAXIMUM_NUMBER_OF_MESSAGES_REACHED = 4030016;
+
+    /**
+     * An error that indicates the message isn't in the approved state, so you can't configure it as a default message.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/messagenotapprovederror
+     */
+    const MESSAGE_NOT_APPROVED = 4030017;
+
+    /**
+     * An error that indicates the image isn't in the approved state, so you can't configure it as part of a default
+     * message.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/imagenotapprovederror
+     */
+    const IMAGE_NOT_APPROVED = 4030018;
+
+    /**
+     * An error that indicates the image is currently in use as part of a message, so you can't delete it.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/imageinuseerror
+     */
+    const IMAGE_IN_USE = 4030019;
 
     /**
      * An error that indicates the App Store account wasn't found.
@@ -413,6 +484,41 @@ enum APIError: int
      * https://developer.apple.com/documentation/appstoreserverapi/transactionidnotfounderror
      */
     case TRANSACTION_ID_NOT_FOUND = 4040010;
+
+    /**
+     * An error that indicates the system can't find the image identifier.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/imagenotfounderror
+     */
+    const IMAGE_NOT_FOUND = 4040014;
+
+    /**
+     * An error that indicates the system can't find the message identifier.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/messagenotfounderror
+     */
+    const MESSAGE_NOT_FOUND = 4040015;
+
+    /**
+     * An error response that indicates an app transaction doesn’t exist for the specified customer.
+     *
+     * https://developer.apple.com/documentation/appstoreserverapi/apptransactiondoesnotexisterror
+     */
+    const APP_TRANSACTION_DOES_NOT_EXIST_ERROR = 4040019;
+
+    /**
+     * An error that indicates the image identifier already exists.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/imagealreadyexistserror
+     */
+    const IMAGE_ALREADY_EXISTS = 4090000;
+
+    /**
+     * An error that indicates the message identifier already exists.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/messagealreadyexistserror
+     */
+    const MESSAGE_ALREADY_EXISTS = 4090001;
 
     /**
      * An error that indicates that the request exceeded the rate limit.
