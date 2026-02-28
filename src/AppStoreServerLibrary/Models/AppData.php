@@ -50,7 +50,7 @@ class AppData
     }
 
     /**
-     * App transaction information signed by the App Store, in JSON Web Signature (JWS) format.
+     * App transaction information signed by the App Store, in JSON Web Signature (JWS) Compact Serialization format.
      *
      * https://developer.apple.com/documentation/appstoreservernotifications/jwsapptransaction
      */

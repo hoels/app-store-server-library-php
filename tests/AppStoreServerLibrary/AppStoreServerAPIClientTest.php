@@ -857,6 +857,96 @@ class AppStoreServerAPIClientTest extends TestCase
         self::fail("Expected client to throw APIException.");
     }
 
+    /**
+     * @throws APIException
+     */
+    public function testGetAppTransactionInfoSuccess(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/appTransactionInfoResponse.json",
+            expectedMethod: "GET",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/appTransactions/1234",
+            expectedParams: [],
+            expectedJson: null,
+        );
+
+        $appTransactionInfoResponse = $client->getAppTransactionInfo(transactionId: "1234");
+        self::assertNotNull($appTransactionInfoResponse);
+        self::assertEquals(
+            "signed_app_transaction_info_value",
+            $appTransactionInfoResponse->getSignedAppTransactionInfo()
+        );
+    }
+
+    public function testGetAppTransactionInfoInvalidTransactionIdError(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/invalidTransactionIdError.json",
+            expectedMethod: "GET",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/appTransactions/invalid_id",
+            expectedParams: [],
+            expectedJson: null,
+            statusCode: 400
+        );
+
+        try {
+            $client->getAppTransactionInfo(transactionId: "invalid_id");
+        } catch (APIException $e) {
+            self::assertEquals(400, $e->getHttpStatusCode());
+            self::assertEquals(APIError::INVALID_TRANSACTION_ID, $e->getApiError());
+            self::assertEquals("Invalid transaction id.", $e->getErrorMessage());
+            return;
+        }
+
+        self::fail("Expected client to throw APIException.");
+    }
+
+    public function testGetAppTransactionInfoAppTransactionDoesNotExistError(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/appTransactionDoesNotExistError.json",
+            expectedMethod: "GET",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/appTransactions/nonexistent_id",
+            expectedParams: [],
+            expectedJson: null,
+            statusCode: 404
+        );
+
+        try {
+            $client->getAppTransactionInfo(transactionId: "nonexistent_id");
+        } catch (APIException $e) {
+            self::assertEquals(404, $e->getHttpStatusCode());
+            self::assertEquals(APIError::APP_TRANSACTION_DOES_NOT_EXIST_ERROR, $e->getApiError());
+            self::assertEquals("No AppTransaction exists for the customer.", $e->getErrorMessage());
+            return;
+        }
+
+        self::fail("Expected client to throw APIException.");
+    }
+
+    public function testGetAppTransactionInfoTransactionIdNotFoundError(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/transactionIdNotFoundError.json",
+            expectedMethod: "GET",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/appTransactions/not_found_id",
+            expectedParams: [],
+            expectedJson: null,
+            statusCode: 404
+        );
+
+        try {
+            $client->getAppTransactionInfo(transactionId: "not_found_id");
+        } catch (APIException $e) {
+            self::assertEquals(404, $e->getHttpStatusCode());
+            self::assertEquals(APIError::TRANSACTION_ID_NOT_FOUND, $e->getApiError());
+            self::assertEquals("Transaction id not found.", $e->getErrorMessage());
+            return;
+        }
+
+        self::fail("Expected client to throw APIException.");
+    }
+
     private function getSigningKey(): string
     {
         $signingKey = file_get_contents(__DIR__ . "/resources/certs/testSigningKey.p8");

@@ -4,6 +4,7 @@ namespace AppStoreServerLibrary;
 
 use AppStoreServerLibrary\AppStoreServerAPIClient\APIException;
 use AppStoreServerLibrary\AppStoreServerAPIClient\GetTransactionHistoryVersion;
+use AppStoreServerLibrary\Models\AppTransactionInfoResponse;
 use AppStoreServerLibrary\Models\CheckTestNotificationResponse;
 use AppStoreServerLibrary\Models\ConsumptionRequest;
 use AppStoreServerLibrary\Models\ConsumptionRequestV1;
@@ -514,5 +515,25 @@ class AppStoreServerAPIClient
             queryParameters: [],
             body: $updateAppAccountTokenRequest
         );
+    }
+
+    /**
+     * Get a customer's app transaction information for your app.
+     * https://developer.apple.com/documentation/appstoreserverapi/get-app-transaction-info
+     *
+     * @param string $transactionId Any originalTransactionId, transactionId or appTransactionId that belongs to the
+     * customer for your app.
+     * @return AppTransactionInfoResponse A response that contains signed app transaction information for a customer.
+     * @throws APIException If a response was returned indicating the request could not be processed
+ */
+    public function getAppTransactionInfo(string $transactionId): AppTransactionInfoResponse
+    {
+        $responseBody = $this->makeRequest(
+            path: "/inApps/v1/transactions/appTransactions/$transactionId",
+            method: "GET",
+            queryParameters: [],
+            body: null
+        );
+        return AppTransactionInfoResponse::fromObject((object)$responseBody);
     }
 }
