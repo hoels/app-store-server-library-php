@@ -11,5 +11,5 @@ enum VerificationStatus: int
     case INVALID_CHAIN_LENGTH = 4;
     case INVALID_CHAIN = 5;
     case INVALID_ENVIRONMENT = 6;
-    case INVALID_JWT_FORMAT = 7;
+    case RETRYABLE_VERIFICATION_FAILURE = 7;
 }

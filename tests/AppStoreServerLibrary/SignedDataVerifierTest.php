@@ -375,7 +375,7 @@ class SignedDataVerifierTest extends TestCase
         try {
             $verifier->verifyAndDecodeNotification($testNotification);
         } catch (VerificationException $e) {
-            self::assertEquals(VerificationStatus::INVALID_JWT_FORMAT, $e->getStatus());
+            self::assertEquals(VerificationStatus::VERIFICATION_FAILURE, $e->getStatus());
             return;
         }
         self::fail("Expected VerificationException.");
@@ -448,7 +448,7 @@ class SignedDataVerifierTest extends TestCase
         try {
             $verifier->verifyAndDecodeNotification("a.b.c.d");
         } catch (VerificationException $e) {
-            self::assertEquals(VerificationStatus::INVALID_JWT_FORMAT, $e->getStatus());
+            self::assertEquals(VerificationStatus::VERIFICATION_FAILURE, $e->getStatus());
             return;
         }
         self::fail("Expected VerificationException.");
@@ -463,7 +463,7 @@ class SignedDataVerifierTest extends TestCase
         try {
             $verifier->verifyAndDecodeNotification("a.b.c");
         } catch (VerificationException $e) {
-            self::assertEquals(VerificationStatus::INVALID_JWT_FORMAT, $e->getStatus());
+            self::assertEquals(VerificationStatus::VERIFICATION_FAILURE, $e->getStatus());
             return;
         }
         self::fail("Expected VerificationException.");
@@ -555,7 +555,7 @@ class SignedDataVerifierTest extends TestCase
     /**
      * @throws VerificationException
      */
-    public function testXcodeSignedAppTransactionWIthProductionEnvironment(): void
+    public function testXcodeSignedAppTransactionWithProductionEnvironment(): void
     {
         $verifier = $this->getSignedDataVerifier(environment: Environment::PRODUCTION, bundleId: self::XCODE_BUNDLE_ID);
         $encodedAppTransaction = file_get_contents(__DIR__ . "/resources/xcode/xcode-signed-app-transaction");
@@ -563,7 +563,7 @@ class SignedDataVerifierTest extends TestCase
         try {
             $verifier->verifyAndDecodeAppTransaction($encodedAppTransaction);
         } catch (VerificationException $e) {
-            self::assertEquals(VerificationStatus::INVALID_JWT_FORMAT, $e->getStatus());
+            self::assertEquals(VerificationStatus::VERIFICATION_FAILURE, $e->getStatus());
             return;
         }
         self::fail("Expected VerificationException.");

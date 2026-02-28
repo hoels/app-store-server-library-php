@@ -71,7 +71,6 @@ class ChainVerifierTest extends TestCase
             self::fail("Expected VerificationException.");
         } catch (VerificationException $e) {
             self::assertEquals(VerificationStatus::VERIFICATION_FAILURE, $e->getStatus());
-            self::assertTrue($e->isPermanentFailure());
         }
     }
 
@@ -97,7 +96,6 @@ class ChainVerifierTest extends TestCase
             self::fail("Expected VerificationException.");
         } catch (VerificationException $e) {
             self::assertEquals(VerificationStatus::VERIFICATION_FAILURE, $e->getStatus());
-            self::assertTrue($e->isPermanentFailure());
         }
     }
 
@@ -108,7 +106,6 @@ class ChainVerifierTest extends TestCase
             self::fail("Expected VerificationException.");
         } catch (VerificationException $e) {
             self::assertEquals(VerificationStatus::INVALID_CERTIFICATE, $e->getStatus());
-            self::assertTrue($e->isPermanentFailure());
         }
     }
 
@@ -131,7 +128,6 @@ class ChainVerifierTest extends TestCase
             self::fail("Expected VerificationException.");
         } catch (VerificationException $e) {
             self::assertEquals(VerificationStatus::VERIFICATION_FAILURE, $e->getStatus());
-            self::assertTrue($e->isPermanentFailure());
         }
     }
 
@@ -154,7 +150,6 @@ class ChainVerifierTest extends TestCase
             self::fail("Expected VerificationException.");
         } catch (VerificationException $e) {
             self::assertEquals(VerificationStatus::VERIFICATION_FAILURE, $e->getStatus());
-            self::assertTrue($e->isPermanentFailure());
         }
     }
 

@@ -68,7 +68,7 @@ class ChainVerifier
     {
         $bodySegments = explode(".", $signedData);
         if (count($bodySegments) !== self::EXPECTED_JWT_SEGMENTS) {
-            throw new VerificationException(VerificationStatus::INVALID_JWT_FORMAT);
+            throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);
         }
         [$headersBase64, $payloadBase64] = $bodySegments;
         try {
@@ -77,7 +77,7 @@ class ChainVerifier
             $unverifiedHeaders = JWT::jsonDecode($headersRaw);
             $body = JWT::jsonDecode($bodyRaw);
         } catch (InvalidArgumentException|DomainException) {
-            throw new VerificationException(VerificationStatus::INVALID_JWT_FORMAT);
+            throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);
         }
         if (is_array($unverifiedHeaders)) {
             $unverifiedHeaders = (object)$unverifiedHeaders;
@@ -86,7 +86,7 @@ class ChainVerifier
             $body = (object)$body;
         }
         if (!$unverifiedHeaders instanceof stdClass || !$body instanceof stdClass) {
-            throw new VerificationException(VerificationStatus::INVALID_JWT_FORMAT);
+            throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);
         }
 
         if ($environment === Environment::XCODE || $environment === Environment::LOCAL_TESTING) {
@@ -103,7 +103,7 @@ class ChainVerifier
             || !is_string($leafCertificateDER = $x5cHeader[0])
             || !is_string($intermediateCertificateDER = $x5cHeader[1])
         ) {
-            throw new VerificationException(VerificationStatus::INVALID_JWT_FORMAT);
+            throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);
         }
 
         try {
@@ -267,14 +267,12 @@ class ChainVerifier
             );
         } catch (GuzzleException) {
             // may occur when no connection can be established
-            throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE, isPermanentFailure: false);
+            throw new VerificationException(VerificationStatus::RETRYABLE_VERIFICATION_FAILURE);
         }
-        if ($response->getStatusCode() >= 500 && $response->getStatusCode() < 600) {
-            throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE, isPermanentFailure: false);
-        } elseif ($response->getStatusCode() !== 200
+        if ($response->getStatusCode() !== 200
             || $response->getHeaderLine("Content-Type") !== OcspResponse::CONTENT_TYPE
         ) {
-            throw new VerificationException(VerificationStatus::VERIFICATION_FAILURE);
+            throw new VerificationException(VerificationStatus::RETRYABLE_VERIFICATION_FAILURE);
         }
 
         // - Decode OCSP response.
