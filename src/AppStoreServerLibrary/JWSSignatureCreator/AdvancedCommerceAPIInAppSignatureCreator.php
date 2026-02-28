@@ -39,7 +39,7 @@ class AdvancedCommerceAPIInAppSignatureCreator extends JWSSignatureCreator
      */
     public function createSignature(AdvancedCommerceAPIInAppRequest $advancedCommerceInAppRequest): string
     {
-        /** @var string $jsonEncodedRequest */
+        /** @var non-empty-string $jsonEncodedRequest */
         $jsonEncodedRequest = json_encode(get_object_vars($advancedCommerceInAppRequest));
         return $this->createSignatureFromClaims(featureSpecificClaims: [
             "request" => base64_encode($jsonEncodedRequest),

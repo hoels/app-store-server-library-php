@@ -107,8 +107,15 @@ class Certificate
             throw new Exception("Invalid certificate.");
         }
 
-        $notValidBefore = (new DateTime())->setTimestamp($data["validFrom_time_t"]);
-        $notValidAfter = (new DateTime())->setTimestamp($data["validTo_time_t"]);
+        /** @var int $notValidBeforeTimestamp */
+        $notValidBeforeTimestamp = $data["validFrom_time_t"];
+        /** @var int $notValidAfterTimestamp */
+        $notValidAfterTimestamp = $data["validTo_time_t"];
+        /** @var array<string, string> $extensions */
+        $extensions = $data["extensions"];
+
+        $notValidBefore = (new DateTime())->setTimestamp($notValidBeforeTimestamp);
+        $notValidAfter = (new DateTime())->setTimestamp($notValidAfterTimestamp);
         $openSSLCertificate = openssl_x509_read($pem);
         if ($openSSLCertificate === false) {
             throw new Exception("Invalid certificate.");
@@ -121,7 +128,7 @@ class Certificate
         return new Certificate(
             notValidBefore: $notValidBefore,
             notValidAfter: $notValidAfter,
-            extensions: $data["extensions"],
+            extensions: $extensions,
             pem: $pem,
             openSSLCertificate: $openSSLCertificate,
             openSSLPublicKey: $openSSLPublicKey

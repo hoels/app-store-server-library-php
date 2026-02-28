@@ -300,6 +300,8 @@ class JWSRenewalInfoDecodedPayload
                 ? OfferDiscountType::tryFrom($obj->offerDiscountType) : null,
             eligibleWinBackOfferIds: property_exists($obj, "eligibleWinBackOfferIds")
                 && is_array($obj->eligibleWinBackOfferIds)
+                && array_is_list($obj->eligibleWinBackOfferIds)
+                && array_filter($obj->eligibleWinBackOfferIds, "is_string") === $obj->eligibleWinBackOfferIds
                 ? $obj->eligibleWinBackOfferIds : null,
             appAccountToken: property_exists($obj, "appAccountToken") && is_string($obj->appAccountToken)
                 ? $obj->appAccountToken : null,

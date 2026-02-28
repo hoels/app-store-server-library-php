@@ -86,6 +86,7 @@ class MassExtendRenewalDateRequest implements JsonSerializable
         /**
          * @var string $key
          * @var int|int[]|string|string[]|boolean|boolean[]|null $value
+         * @phpstan-ignore foreach.nonIterable
          */
         foreach ($this as $key => $value) {
             if ($value !== null) {

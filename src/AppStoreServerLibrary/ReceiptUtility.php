@@ -26,18 +26,18 @@ class ReceiptUtility
      */
     public function extractTransactionIdFromAppReceipt(string $appReceipt): ?string
     {
-        $decodedArray = ASN1::decodeBER(base64_decode($appReceipt));
-        $current = $decodedArray[0] ?? null;
-        $type = $current["type"] ?? null;
-        if ($type !== ASN1::TYPE_SEQUENCE) {
+        if (!is_array($decodedArray = ASN1::decodeBER(base64_decode($appReceipt)))
+            || !is_array($current = $decodedArray[0] ?? null)
+            || ($current["type"] ?? null) !== ASN1::TYPE_SEQUENCE
+        ) {
             throw new ValueError();
         }
 
         # PKCS#7 object
-        $currentRead = $current["content"][0] ?? null;
-        $type = $currentRead["type"] ?? null;
-        $value = $currentRead["content"] ?? null;
-        if ($type !== ASN1::TYPE_OBJECT_IDENTIFIER || $value !== self::PKCS7_OID) {
+        if (!is_array($currentRead = $current["content"][0] ?? null)
+            || ($currentRead["type"] ?? null) !== ASN1::TYPE_OBJECT_IDENTIFIER
+            || ($currentRead["content"] ?? null) !== self::PKCS7_OID
+        ) {
             throw new ValueError();
         }
 
@@ -51,18 +51,18 @@ class ReceiptUtility
         $value = $currentRead["content"] ?? null;
 
         // Xcode uses nested OctetStrings, we extract the inner string in this case
-        if ($type !== ASN1::TYPE_OCTET_STRING) {
+        if ($type !== ASN1::TYPE_OCTET_STRING || !is_string($value)) {
             throw new ValueError();
         }
         $decodedArray = ASN1::decodeBER($value);
         $current = $decodedArray[0] ?? null;
         $type = $current["type"] ?? null;
-        if ($type !== ASN1::TYPE_SET) {
+        if ($type !== ASN1::TYPE_SET || !is_array($current = $current["content"] ?? [])) {
             throw new ValueError();
         }
 
         // We are in the top-level sequence, work our way to the array of in-apps
-        foreach ($current["content"] ?? [] as $loopCurrent) {
+        foreach ($current as $loopCurrent) {
             $currentRead = $loopCurrent["content"][0] ?? null;
             $type = $currentRead["type"] ?? null;
             $value = $currentRead["content"] ?? null;
@@ -73,14 +73,17 @@ class ReceiptUtility
                 $currentRead = $loopCurrent["content"][2] ?? null;
                 $type = $currentRead["type"] ?? null;
                 $value = $currentRead["content"] ?? null;
-                if ($type !== ASN1::TYPE_OCTET_STRING) {
+                if ($type !== ASN1::TYPE_OCTET_STRING || !is_string($value)) {
                     throw new ValueError();
                 }
 
                 // In-app array
                 $decodedArray = ASN1::decodeBER($value);
                 $currentInApp = $decodedArray[0] ?? null;
-                foreach ($currentInApp["content"] ?? null as $loopCurrentInApp) {
+                if (!is_array($currentInApp = $currentInApp["content"] ?? null)) {
+                    throw new ValueError();
+                }
+                foreach ($currentInApp as $loopCurrentInApp) {
                     $currentRead = $loopCurrentInApp["content"][0] ?? null;
                     $type = $currentRead["type"] ?? null;
                     $value = $currentRead["content"] ?? null;
@@ -95,11 +98,16 @@ class ReceiptUtility
                         $currentRead = $loopCurrentInApp["content"][2] ?? null;
                         $type = $currentRead["type"] ?? null;
                         $value = $currentRead["content"] ?? null;
-                        if ($type !== ASN1::TYPE_OCTET_STRING) {
+                        if ($type !== ASN1::TYPE_OCTET_STRING || !is_string($value)) {
                             throw new ValueError();
                         }
                         $decodedArray = ASN1::decodeBER($value);
-                        return $decodedArray[0]["content"] ?? null;
+                        if (!is_string($transactionId = $decodedArray[0]["content"] ?? null)
+                            && $transactionId !== null
+                        ) {
+                            throw new ValueError();
+                        }
+                        return $transactionId;
                     }
                 }
             }

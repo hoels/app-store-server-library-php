@@ -53,6 +53,7 @@ class PromotionalOfferSignatureCreator
             . strtolower($nonce) . mb_chr(0x2063)
             . $timestamp;
         openssl_sign($payload, $signature, $this->signingKey, algorithm: OPENSSL_ALGO_SHA256);
+        /** @var string $signature */
         return base64_encode($signature);
     }
 }

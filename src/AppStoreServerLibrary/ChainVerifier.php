@@ -99,13 +99,16 @@ class ChainVerifier
         $algorithmHeader = $unverifiedHeaders->alg ?? null;
         if ($algorithmHeader !== self::EXPECTED_ALGORITHM
             || !is_array($x5cHeader)
-            || count($x5cHeader) !== self::EXPECTED_CHAIN_LENGTH) {
+            || count($x5cHeader) !== self::EXPECTED_CHAIN_LENGTH
+            || !is_string($leafCertificateDER = $x5cHeader[0])
+            || !is_string($intermediateCertificateDER = $x5cHeader[1])
+        ) {
             throw new VerificationException(VerificationStatus::INVALID_JWT_FORMAT);
         }
 
         try {
-            $leafCertificate = Certificate::fromDER($x5cHeader[0], isBase64Encoded: true);
-            $intermediateCertificate = Certificate::fromDER($x5cHeader[1], isBase64Encoded: true);
+            $leafCertificate = Certificate::fromDER($leafCertificateDER, isBase64Encoded: true);
+            $intermediateCertificate = Certificate::fromDER($intermediateCertificateDER, isBase64Encoded: true);
         } catch (Exception) {
             throw new VerificationException(VerificationStatus::INVALID_CERTIFICATE);
         }
@@ -320,8 +323,6 @@ class ChainVerifier
         if ($verifiedPublicKey === null) {
             return null;
         }
-        $expiration = $verifiedPublicKey[1];
-        $time = $this->time();
         if ($verifiedPublicKey[1] <= $this->time()) {
             unset($this->verifiedCertificatesCache[$cacheKey]);
             return null;

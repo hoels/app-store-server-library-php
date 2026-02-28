@@ -15,10 +15,10 @@ class APIException extends Exception
         ?int $rawApiError = null,
         ?string $errorMessage = null,
     ) {
-        parent::__construct(code: $httpStatusCode);
+        parent::__construct(message: $errorMessage ?? "", code: $httpStatusCode);
         $this->httpStatusCode = $httpStatusCode;
         $this->apiError = $rawApiError === null ? null : APIError::tryFrom($rawApiError);
-        $this->errorMessage = $this->message = $errorMessage;
+        $this->errorMessage = $errorMessage;
     }
 
     public function getHttpStatusCode(): int
