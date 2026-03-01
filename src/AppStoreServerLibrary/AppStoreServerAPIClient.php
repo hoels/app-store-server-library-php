@@ -38,7 +38,7 @@ use ValueError;
 
 class AppStoreServerAPIClient
 {
-    const USER_AGENT = "app-store-server-library/php/1.9.0";
+    const USER_AGENT = "app-store-server-library/php/2.0.0";
     const PRODUCTION_URL = "https://api.storekit.itunes.apple.com";
     const LOCAL_TESTING_URL = "https://local-testing-base-url";
     const SANDBOX_URL = "https://api.storekit-sandbox.itunes.apple.com";
