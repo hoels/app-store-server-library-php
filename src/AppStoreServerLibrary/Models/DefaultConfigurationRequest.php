@@ -5,26 +5,25 @@ namespace AppStoreServerLibrary\Models;
 use JsonSerializable;
 
 /**
- * The request body that contains an app account token value.
+ * The request body that contains the default configuration information.
  *
- * https://developer.apple.com/documentation/appstoreserverapi/updateappaccounttokenrequest
+ * https://developer.apple.com/documentation/retentionmessaging/defaultconfigurationrequest
  */
-class UpdateAppAccountTokenRequest implements JsonSerializable
+class DefaultConfigurationRequest implements JsonSerializable
 {
     public function __construct(
-        private readonly string $appAccountToken,
+        private readonly string $messageIdentifier,
     ) {
     }
 
     /**
-     * The UUID that an app optionally generates to map a customer's in-app purchase with its resulting App Store
-     * transaction.
+     * The message identifier of the message to configure as a default message.
      *
-     * https://developer.apple.com/documentation/appstoreserverapi/appaccounttoken
+     * https://developer.apple.com/documentation/retentionmessaging/messageidentifier
      */
-    public function getAppAccountToken(): string
+    public function getMessageIdentifier(): string
     {
-        return $this->appAccountToken;
+        return $this->messageIdentifier;
     }
 
     /**

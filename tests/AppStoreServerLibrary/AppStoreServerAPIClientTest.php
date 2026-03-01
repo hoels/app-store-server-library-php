@@ -9,16 +9,19 @@ use AppStoreServerLibrary\Models\AccountTenure;
 use AppStoreServerLibrary\Models\ConsumptionRequest;
 use AppStoreServerLibrary\Models\ConsumptionRequestV1;
 use AppStoreServerLibrary\Models\ConsumptionStatus;
+use AppStoreServerLibrary\Models\DefaultConfigurationRequest;
 use AppStoreServerLibrary\Models\DeliveryStatus;
 use AppStoreServerLibrary\Models\DeliveryStatusV1;
 use AppStoreServerLibrary\Models\Environment;
 use AppStoreServerLibrary\Models\ExtendReasonCode;
 use AppStoreServerLibrary\Models\ExtendRenewalDateRequest;
+use AppStoreServerLibrary\Models\ImageState;
 use AppStoreServerLibrary\Models\InAppOwnershipType;
 use AppStoreServerLibrary\Models\LastTransactionsItem;
 use AppStoreServerLibrary\Models\LifetimeDollarsPurchased;
 use AppStoreServerLibrary\Models\LifetimeDollarsRefunded;
 use AppStoreServerLibrary\Models\MassExtendRenewalDateRequest;
+use AppStoreServerLibrary\Models\MessageState;
 use AppStoreServerLibrary\Models\NotificationHistoryRequest;
 use AppStoreServerLibrary\Models\NotificationHistoryResponseItem;
 use AppStoreServerLibrary\Models\NotificationTypeV2;
@@ -36,6 +39,7 @@ use AppStoreServerLibrary\Models\TransactionHistoryRequest;
 use AppStoreServerLibrary\Models\TransactionHistoryRequest\Order;
 use AppStoreServerLibrary\Models\TransactionHistoryRequest\ProductType;
 use AppStoreServerLibrary\Models\UpdateAppAccountTokenRequest;
+use AppStoreServerLibrary\Models\UploadMessageRequestBody;
 use AppStoreServerLibrary\Models\UserStatus;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
@@ -60,7 +64,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/extendRenewalDateForAllActiveSubscribersResponse.json",
             expectedMethod: "POST",
             expectedUrl: "https://local-testing-base-url/inApps/v1/subscriptions/extend/mass",
-            expectedParams: [],
             expectedJson: [
                 "extendByDays" => 45,
                 "extendReasonCode" => 1,
@@ -97,7 +100,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/extendSubscriptionRenewalDateResponse.json",
             expectedMethod: "PUT",
             expectedUrl: "https://local-testing-base-url/inApps/v1/subscriptions/extend/4124214",
-            expectedParams: [],
             expectedJson: [
                 "extendByDays" => 45,
                 "extendReasonCode" => 1,
@@ -134,7 +136,6 @@ class AppStoreServerAPIClientTest extends TestCase
             expectedParams: [
                 "status" => ["2", "1"]
             ],
-            expectedJson: null
         );
 
         $statusResponse = $client->getAllSubscriptionStatuses(
@@ -191,7 +192,6 @@ class AppStoreServerAPIClientTest extends TestCase
             expectedParams: [
                 "revision" => ["revision_input"]
             ],
-            expectedJson: null
         );
 
         $refundHistoryResponse = $client->getRefundHistory(
@@ -217,8 +217,6 @@ class AppStoreServerAPIClientTest extends TestCase
             expectedMethod: "GET",
             expectedUrl: "https://local-testing-base-url/inApps/v1/subscriptions/extend/mass/"
                 . "20fba8a0-2b80-4a7d-a17f-85c1854727f8/com.example.product",
-            expectedParams: [],
-            expectedJson: null
         );
 
         $massExtendRenewalDateStatusResponse = $client->getStatusOfSubscriptionRenewalDateExtensions(
@@ -246,8 +244,6 @@ class AppStoreServerAPIClientTest extends TestCase
             expectedMethod: "GET",
             expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/test/"
                 . "8cd2974c-f905-492a-bf9a-b2f47c791d19",
-            expectedParams: [],
-            expectedJson: null
         );
 
         $testNotificationResponse = $client->getTestNotificationStatus(
@@ -341,7 +337,6 @@ class AppStoreServerAPIClientTest extends TestCase
                 "inAppOwnershipType" => ["FAMILY_SHARED"],
                 "revoked" => ["false"],
             ],
-            expectedJson: null
         );
 
         $transactionHistoryRequest = new TransactionHistoryRequest(
@@ -393,7 +388,6 @@ class AppStoreServerAPIClientTest extends TestCase
                 "inAppOwnershipType" => ["FAMILY_SHARED"],
                 "revoked" => ["false"],
             ],
-            expectedJson: null
         );
 
         $transactionHistoryRequest = new TransactionHistoryRequest(
@@ -434,8 +428,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/transactionInfoResponse.json",
             expectedMethod: "GET",
             expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/1234",
-            expectedParams: [],
-            expectedJson: null
         );
 
         $transactionInfoResponse = $client->getTransactionInfo(
@@ -454,8 +446,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/lookupOrderIdResponse.json",
             expectedMethod: "GET",
             expectedUrl: "https://local-testing-base-url/inApps/v1/lookup/W002182",
-            expectedParams: [],
-            expectedJson: null
         );
 
         $orderLookupResponse = $client->lookUpOrderId(
@@ -478,8 +468,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/requestTestNotificationResponse.json",
             expectedMethod: "POST",
             expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/test",
-            expectedParams: [],
-            expectedJson: null
         );
 
         $sendTestNotificationResponse = $client->requestTestNotification();
@@ -499,7 +487,6 @@ class AppStoreServerAPIClientTest extends TestCase
             body: "",
             expectedMethod: "PUT",
             expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/consumption/49571273",
-            expectedParams: [],
             expectedJson: [
                 "customerConsented" => true,
                 "consumptionStatus" => 1,
@@ -547,7 +534,6 @@ class AppStoreServerAPIClientTest extends TestCase
             body: "",
             expectedMethod: "PUT",
             expectedUrl: "https://local-testing-base-url/inApps/v2/transactions/consumption/49571273",
-            expectedParams: [],
             expectedJson: [
                 "customerConsented" => true,
                 "sampleContentProvided" => false,
@@ -577,8 +563,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/apiException.json",
             expectedMethod: "POST",
             expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/test",
-            expectedParams: [],
-            expectedJson: null,
             statusCode: 500
         );
 
@@ -618,8 +602,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/apiTooManyRequestsException.json",
             expectedMethod: "POST",
             expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/test",
-            expectedParams: [],
-            expectedJson: null,
             statusCode: 429
         );
 
@@ -641,8 +623,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/apiUnknownError.json",
             expectedMethod: "POST",
             expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/test",
-            expectedParams: [],
-            expectedJson: null,
             statusCode: 400
         );
 
@@ -678,7 +658,6 @@ class AppStoreServerAPIClientTest extends TestCase
                 "inAppOwnershipType" => ["FAMILY_SHARED"],
                 "revoked" => ["false"]
             ],
-            expectedJson: null
         );
 
         $transactionHistoryRequest = new TransactionHistoryRequest(
@@ -721,7 +700,6 @@ class AppStoreServerAPIClientTest extends TestCase
                 "inAppOwnershipType" => ["FAMILY_SHARED"],
                 "revoked" => ["false"]
             ],
-            expectedJson: null
         );
 
         $transactionHistoryRequest = new TransactionHistoryRequest(
@@ -753,7 +731,6 @@ class AppStoreServerAPIClientTest extends TestCase
             body: "",
             expectedMethod: "PUT",
             expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/49571273/appAccountToken",
-            expectedParams: [],
             expectedJson: ["appAccountToken" => "7389a31a-fb6d-4569-a2a6-db7d85d84813"]
         );
 
@@ -773,7 +750,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/invalidAppAccountTokenUUIDError.json",
             expectedMethod: "PUT",
             expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/49571273/appAccountToken",
-            expectedParams: [],
             expectedJson: ["appAccountToken" => ""],
             statusCode: 400
         );
@@ -803,7 +779,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/familyTransactionNotSupportedError.json",
             expectedMethod: "PUT",
             expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/1234/appAccountToken",
-            expectedParams: [],
             expectedJson: ["appAccountToken" => ""],
             statusCode: 400
         );
@@ -833,7 +808,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/transactionIdNotOriginalTransactionId.json",
             expectedMethod: "PUT",
             expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/1234/appAccountToken",
-            expectedParams: [],
             expectedJson: ["appAccountToken" => ""],
             statusCode: 400
         );
@@ -866,8 +840,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/appTransactionInfoResponse.json",
             expectedMethod: "GET",
             expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/appTransactions/1234",
-            expectedParams: [],
-            expectedJson: null,
         );
 
         $appTransactionInfoResponse = $client->getAppTransactionInfo(transactionId: "1234");
@@ -884,8 +856,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/invalidTransactionIdError.json",
             expectedMethod: "GET",
             expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/appTransactions/invalid_id",
-            expectedParams: [],
-            expectedJson: null,
             statusCode: 400
         );
 
@@ -907,8 +877,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/appTransactionDoesNotExistError.json",
             expectedMethod: "GET",
             expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/appTransactions/nonexistent_id",
-            expectedParams: [],
-            expectedJson: null,
             statusCode: 404
         );
 
@@ -930,8 +898,6 @@ class AppStoreServerAPIClientTest extends TestCase
             path: __DIR__ . "/resources/models/transactionIdNotFoundError.json",
             expectedMethod: "GET",
             expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/appTransactions/not_found_id",
-            expectedParams: [],
-            expectedJson: null,
             statusCode: 404
         );
 
@@ -947,6 +913,138 @@ class AppStoreServerAPIClientTest extends TestCase
         self::fail("Expected client to throw APIException.");
     }
 
+    /**
+     * @throws APIException
+     */
+    public function testUploadImage(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "PUT",
+            expectedUrl:
+            "https://local-testing-base-url/inApps/v1/messaging/image/a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890",
+            expectedBody: "\x01\x02\x03",
+            expectedContentType: "image/png",
+        );
+        $client->uploadImage(imageIdentifier: "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890", image: "\x01\x02\x03");
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testDeleteImage(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "DELETE",
+            expectedUrl:
+            "https://local-testing-base-url/inApps/v1/messaging/image/a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890",
+        );
+        $client->deleteImage(imageIdentifier: "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890");
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testGetImageList(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/getImageListResponse.json",
+            expectedMethod: "GET",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/messaging/image/list",
+        );
+        $response = $client->getImageList();
+        self::assertCount(1, $response->getImageIdentifiers());
+        $imageIdentifier = $response->getImageIdentifiers()[0];
+        self::assertEquals("a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890", $imageIdentifier->getImageIdentifier());
+        self::assertEquals(ImageState::APPROVED, $imageIdentifier->getImageState());
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testUploadMessage(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "PUT",
+            expectedUrl:
+            "https://local-testing-base-url/inApps/v1/messaging/message/a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890",
+            expectedJson: [
+                "header" => "Header text",
+                "body" => "Body text",
+            ],
+        );
+        $client->uploadMessage(
+            messageIdentifier: "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890",
+            uploadMessageRequestBody: new UploadMessageRequestBody(header: "Header text", body: "Body text")
+        );
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testDeleteMessage(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "DELETE",
+            expectedUrl:
+            "https://local-testing-base-url/inApps/v1/messaging/message/a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890",
+        );
+        $client->deleteMessage(messageIdentifier: "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890");
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testGetMessageList(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/getMessageListResponse.json",
+            expectedMethod: "GET",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/messaging/message/list",
+        );
+        $response = $client->getMessageList();
+        self::assertCount(1, $response->getMessageIdentifiers());
+        $messageIdentifier = $response->getMessageIdentifiers()[0];
+        self::assertEquals("a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890", $messageIdentifier->getMessageIdentifier());
+        self::assertEquals(MessageState::APPROVED, $messageIdentifier->getMessageState());
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testConfigureDefaultMessage(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "PUT",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/messaging/default/com.example.product/en-US",
+            expectedJson: ["messageIdentifier" => "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890"],
+        );
+        $client->configureDefaultMessage(
+            productId: "com.example.product",
+            locale: "en-US",
+            defaultConfigurationRequest: new DefaultConfigurationRequest(
+                messageIdentifier: "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890"
+            )
+        );
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testDeleteDefaultMessage(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "DELETE",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/messaging/default/com.example.product/en-US",
+        );
+        $client->deleteDefaultMessage(productId: "com.example.product", locale: "en-US");
+    }
+
     private function getSigningKey(): string
     {
         $signingKey = file_get_contents(__DIR__ . "/resources/certs/testSigningKey.p8");
@@ -959,9 +1057,11 @@ class AppStoreServerAPIClientTest extends TestCase
         string $body,
         string $expectedMethod,
         string $expectedUrl,
-        array $expectedParams,
-        ?array $expectedJson,
-        int $statusCode = 200
+        array $expectedParams = [],
+        ?array $expectedJson = null,
+        ?string $expectedBody = null,
+        ?string $expectedContentType = null,
+        int $statusCode = 200,
     ): AppStoreServerAPIClient {
         $response = new Response(
             status: $statusCode,
@@ -987,15 +1087,16 @@ class AppStoreServerAPIClientTest extends TestCase
             ->with(
                 $this->equalTo($expectedMethod),
                 $this->equalTo($expectedUri),
-                $this->callback(function (array $options) use ($expectedJson) {
+                $this->callback(function (array $options) use ($expectedJson, $expectedBody, $expectedContentType) {
                     $headers = $options[RequestOptions::HEADERS] ?? null;
-                    $json = $options[RequestOptions::JSON] ?? null;
                     if (!is_array($headers)
-                        || ["User-Agent", "Authorization", "Accept"] !== array_keys($headers)
-                        || "application/json" !== $headers["Accept"]
-                        || AppStoreServerAPIClient::USER_AGENT !== $headers["User-Agent"]
-                        || !str_starts_with($headers["Authorization"], "Bearer ")
-                        || json_encode($expectedJson) !== json_encode($json)) {
+                        || "application/json" !== ($headers["Accept"] ?? null)
+                        || AppStoreServerAPIClient::USER_AGENT !== ($headers["User-Agent"] ?? null)
+                        || !str_starts_with($headers["Authorization"] ?? "", "Bearer ")
+                        || $expectedContentType !== ($headers["Content-Type"] ?? null)
+                        || json_encode($expectedJson) !== json_encode($options[RequestOptions::JSON] ?? null)
+                        || $expectedBody !== ($options[RequestOptions::BODY] ?? null)
+                    ) {
                         return false;
                     }
 
@@ -1031,9 +1132,11 @@ class AppStoreServerAPIClientTest extends TestCase
         string $path,
         string $expectedMethod,
         string $expectedUrl,
-        ?array $expectedParams,
-        ?array $expectedJson,
-        int $statusCode = 200
+        array $expectedParams = [],
+        ?array $expectedJson = null,
+        ?string $expectedBody = null,
+        ?string $expectedContentType = null,
+        int $statusCode = 200,
     ): AppStoreServerAPIClient {
         $body = file_get_contents($path);
         return $this->getClientWithBody(
@@ -1042,6 +1145,8 @@ class AppStoreServerAPIClientTest extends TestCase
             expectedUrl: $expectedUrl,
             expectedParams: $expectedParams,
             expectedJson: $expectedJson,
+            expectedBody: $expectedBody,
+            expectedContentType: $expectedContentType,
             statusCode: $statusCode
         );
     }

@@ -326,6 +326,26 @@ class SignedDataVerifierTest extends TestCase
     }
 
     /**
+     * @throws VerificationException
+     */
+    public function testRealtimeRequestDecoding(): void
+    {
+        $signedRealtimeRequest = $this->createSignedDataFromJson(
+            path: __DIR__ . "/resources/models/decodedRealtimeRequest.json"
+        );
+        $signedDataVerifierMock = $this->getDefaultSignedDataVerifier();
+
+        $request = $signedDataVerifierMock->verifyAndDecodeRealtimeRequest($signedRealtimeRequest);
+        $this->assertEquals("99371282", $request->getOriginalTransactionId());
+        $this->assertEquals(531412, $request->getAppAppleId());
+        $this->assertEquals("com.example.product", $request->getProductId());
+        $this->assertEquals("en-US", $request->getUserLocale());
+        $this->assertEquals("3db5c98d-8acf-4e29-831e-8e1f82f9f6e9", $request->getRequestIdentifier());
+        $this->assertEquals(Environment::LOCAL_TESTING, $request->getEnvironment());
+        $this->assertEquals(1698148900000, $request->getSignedDate());
+    }
+
+    /**
      * @throws Exception|VerificationException
      */
     public function testSelfSignedExternalPurchaseTokenSandboxNotificationDecoding(): void

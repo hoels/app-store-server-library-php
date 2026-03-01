@@ -3,6 +3,7 @@
 namespace AppStoreServerLibrary;
 
 use AppStoreServerLibrary\Models\AppTransaction;
+use AppStoreServerLibrary\Models\DecodedRealtimeRequestBody;
 use AppStoreServerLibrary\Models\Environment;
 use AppStoreServerLibrary\Models\JWSRenewalInfoDecodedPayload;
 use AppStoreServerLibrary\Models\JWSTransactionDecodedPayload;
@@ -153,6 +154,28 @@ class SignedDataVerifier
             throw new VerificationException(VerificationStatus::INVALID_ENVIRONMENT);
         }
         return $decodedAppTransaction;
+    }
+
+    /**
+     * Verifies and decodes a Retention Messaging API signedPayload
+     * See https://developer.apple.com/documentation/retentionmessaging/signedpayload
+     *
+     * @param string $signedPayload The payload received by your server
+     * @return DecodedRealtimeRequestBody The decoded payload after verification
+     * @throws VerificationException Thrown if the data could not be verified
+     */
+    public function verifyAndDecodeRealtimeRequest(string $signedPayload): DecodedRealtimeRequestBody
+    {
+        $decodedRealtimeRequestBody = DecodedRealtimeRequestBody::fromObject($this->decodeSignedObject($signedPayload));
+        if ($this->environment === Environment::PRODUCTION
+            && $decodedRealtimeRequestBody->getAppAppleId() !== $this->appAppleId
+        ) {
+            throw new VerificationException(VerificationStatus::INVALID_APP_IDENTIFIER);
+        }
+        if ($decodedRealtimeRequestBody->getEnvironment() !== $this->environment) {
+            throw new VerificationException(VerificationStatus::INVALID_ENVIRONMENT);
+        }
+        return $decodedRealtimeRequestBody;
     }
 
     /**

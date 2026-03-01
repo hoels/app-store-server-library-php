@@ -8,9 +8,12 @@ use AppStoreServerLibrary\Models\AppTransactionInfoResponse;
 use AppStoreServerLibrary\Models\CheckTestNotificationResponse;
 use AppStoreServerLibrary\Models\ConsumptionRequest;
 use AppStoreServerLibrary\Models\ConsumptionRequestV1;
+use AppStoreServerLibrary\Models\DefaultConfigurationRequest;
 use AppStoreServerLibrary\Models\Environment;
 use AppStoreServerLibrary\Models\ExtendRenewalDateRequest;
 use AppStoreServerLibrary\Models\ExtendRenewalDateResponse;
+use AppStoreServerLibrary\Models\GetImageListResponse;
+use AppStoreServerLibrary\Models\GetMessageListResponse;
 use AppStoreServerLibrary\Models\HistoryResponse;
 use AppStoreServerLibrary\Models\MassExtendRenewalDateRequest;
 use AppStoreServerLibrary\Models\MassExtendRenewalDateResponse;
@@ -25,6 +28,7 @@ use AppStoreServerLibrary\Models\StatusResponse;
 use AppStoreServerLibrary\Models\TransactionHistoryRequest;
 use AppStoreServerLibrary\Models\TransactionInfoResponse;
 use AppStoreServerLibrary\Models\UpdateAppAccountTokenRequest;
+use AppStoreServerLibrary\Models\UploadMessageRequestBody;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -92,17 +96,30 @@ class AppStoreServerAPIClient
      * @return mixed[]
      * @throws APIException
      */
-    private function makeRequest(string $path, string $method, array $queryParameters, ?JsonSerializable $body): array
-    {
-        $headers = [
-            "User-Agent" => self::USER_AGENT,
-            "Authorization" => "Bearer " . $this->generateToken(),
-            "Accept" => "application/json",
+    private function makeRequest(
+        string $path,
+        string $method,
+        array $queryParameters,
+        JsonSerializable|string|null $body,
+        ?string $contentType = null,
+    ): array {
+        $options = [
+            RequestOptions::HEADERS => [
+                "User-Agent" => self::USER_AGENT,
+                "Authorization" => "Bearer {$this->generateToken()}",
+                "Accept" => "application/json",
+            ],
+            RequestOptions::HTTP_ERRORS => false,
         ];
-
-        $options = [RequestOptions::HEADERS => $headers, RequestOptions::HTTP_ERRORS => false];
         if ($body !== null) {
-            $options[RequestOptions::JSON] = $body->jsonSerialize();
+            if (is_string($body)) {
+                if ($contentType !== null) {
+                    $options[RequestOptions::HEADERS]["Content-Type"] = $contentType;
+                }
+                $options[RequestOptions::BODY] = $body;
+            } else {
+                $options[RequestOptions::JSON] = $body->jsonSerialize();
+            }
         }
 
         $queryItems = [];
@@ -525,7 +542,7 @@ class AppStoreServerAPIClient
      * customer for your app.
      * @return AppTransactionInfoResponse A response that contains signed app transaction information for a customer.
      * @throws APIException If a response was returned indicating the request could not be processed
- */
+     */
     public function getAppTransactionInfo(string $transactionId): AppTransactionInfoResponse
     {
         $responseBody = $this->makeRequest(
@@ -535,5 +552,153 @@ class AppStoreServerAPIClient
             body: null
         );
         return AppTransactionInfoResponse::fromObject((object)$responseBody);
+    }
+
+    /**
+     * Upload an image to use for retention messaging.
+     * https://developer.apple.com/documentation/retentionmessaging/upload-image
+     *
+     * @param string $imageIdentifier A UUID you provide to uniquely identify the image you upload.
+     * @param string $image The binary data of the image to upload.
+     * @throws APIException If a response was returned indicating the request could not be processed
+     */
+    public function uploadImage(string $imageIdentifier, string $image): void
+    {
+        $this->makeRequest(
+            path: "/inApps/v1/messaging/image/$imageIdentifier",
+            method: "PUT",
+            queryParameters: [],
+            body: $image,
+            contentType: "image/png",
+        );
+    }
+
+    /**
+     * Delete a previously uploaded image.
+     * https://developer.apple.com/documentation/retentionmessaging/delete-image
+     *
+     * @param string $imageIdentifier The identifier of the image to delete.
+     * @throws APIException If a response was returned indicating the request could not be processed
+     */
+    public function deleteImage(string $imageIdentifier): void
+    {
+        $this->makeRequest(
+            path: "/inApps/v1/messaging/image/$imageIdentifier",
+            method: "DELETE",
+            queryParameters: [],
+            body: null,
+        );
+    }
+
+    /**
+     * Get the image identifier and state for all uploaded images.
+     * https://developer.apple.com/documentation/retentionmessaging/get-image-list
+     *
+     * @return GetImageListResponse A response that contains status information for all images.
+     * @throws APIException If a response was returned indicating the request could not be processed
+     */
+    public function getImageList(): GetImageListResponse
+    {
+        $responseBody = $this->makeRequest(
+            path: "/inApps/v1/messaging/image/list",
+            method: "GET",
+            queryParameters: [],
+            body: null,
+        );
+        return GetImageListResponse::fromObject((object)$responseBody);
+    }
+
+    /**
+     * Upload a message to use for retention messaging.
+     * https://developer.apple.com/documentation/retentionmessaging/upload-message
+     *
+     * @param string $messageIdentifier A UUID you provide to uniquely identify the message you upload.
+     * @param UploadMessageRequestBody $uploadMessageRequestBody The message text to upload.
+     * @throws APIException If a response was returned indicating the request could not be processed
+     */
+    public function uploadMessage(string $messageIdentifier, UploadMessageRequestBody $uploadMessageRequestBody): void
+    {
+        $this->makeRequest(
+            path: "/inApps/v1/messaging/message/$messageIdentifier",
+            method: "PUT",
+            queryParameters: [],
+            body: $uploadMessageRequestBody,
+        );
+    }
+
+    /**
+     * Delete a previously uploaded message.
+     * https://developer.apple.com/documentation/retentionmessaging/delete-message
+     *
+     * @param string $messageIdentifier The identifier of the message to delete.
+     * @throws APIException If a response was returned indicating the request could not be processed
+     */
+    public function deleteMessage(string $messageIdentifier): void
+    {
+        $this->makeRequest(
+            path: "/inApps/v1/messaging/message/$messageIdentifier",
+            method: "DELETE",
+            queryParameters: [],
+            body: null,
+        );
+    }
+
+    /**
+     * Get the message identifier and state for all uploaded messages.
+     * https://developer.apple.com/documentation/retentionmessaging/get-message-list
+     *
+     * @return GetMessageListResponse A response that contains status information for all messages.
+     * @throws APIException If a response was returned indicating the request could not be processed
+     */
+    public function getMessageList(): GetMessageListResponse
+    {
+        $responseBody = $this->makeRequest(
+            path: "/inApps/v1/messaging/message/list",
+            method: "GET",
+            queryParameters: [],
+            body: null,
+        );
+        return GetMessageListResponse::fromObject((object)$responseBody);
+    }
+
+    /**
+     * Configure a default message for a specific product in a specific locale.
+     * https://developer.apple.com/documentation/retentionmessaging/configure-default-message
+     *
+     * @param string $productId The product identifier for the default configuration.
+     * @param string $locale The locale for the default configuration.
+     * @param DefaultConfigurationRequest $defaultConfigurationRequest The request body that includes the message
+     * identifier to configure as the default message.
+     * @throws APIException If a response was returned indicating the request could not be processed
+     */
+    public function configureDefaultMessage(
+        string $productId,
+        string $locale,
+        DefaultConfigurationRequest $defaultConfigurationRequest,
+    ): void {
+        $this->makeRequest(
+            path: "/inApps/v1/messaging/default/$productId/$locale",
+            method: "PUT",
+            queryParameters: [],
+            body: $defaultConfigurationRequest,
+        );
+    }
+
+    /**
+     * Delete a default message for a product in a locale.
+     * https://developer.apple.com/documentation/retentionmessaging/delete-default-message
+     *
+     * @param string $productId The product ID of the default message configuration.
+     * @param string $locale The locale of the default message configuration.
+     * @throws APIException If a response was returned indicating the request could not be processed
+     */
+    public function deleteDefaultMessage(string $productId, string $locale): void
+    {
+        $this->makeRequest(
+            path: "/inApps/v1/messaging/default/$productId/$locale",
+            method: "DELETE",
+            queryParameters: [],
+            body: null,
+        );
     }
 }

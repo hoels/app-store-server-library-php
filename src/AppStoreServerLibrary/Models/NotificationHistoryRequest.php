@@ -104,7 +104,7 @@ class NotificationHistoryRequest implements JsonSerializable
          */
         foreach ($this as $key => $value) {
             if ($value !== null) {
-                $array[$key] = $value;
+                $array[$key] = $value instanceof JsonSerializable ? $value->jsonSerialize() : $value;
             }
         }
 
