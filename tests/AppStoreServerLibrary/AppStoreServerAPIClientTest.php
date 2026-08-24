@@ -15,6 +15,7 @@ use AppStoreServerLibrary\Models\DeliveryStatusV1;
 use AppStoreServerLibrary\Models\Environment;
 use AppStoreServerLibrary\Models\ExtendReasonCode;
 use AppStoreServerLibrary\Models\ExtendRenewalDateRequest;
+use AppStoreServerLibrary\Models\ExternalPurchaseReport;
 use AppStoreServerLibrary\Models\ImageState;
 use AppStoreServerLibrary\Models\InAppOwnershipType;
 use AppStoreServerLibrary\Models\LastTransactionsItem;
@@ -25,14 +26,17 @@ use AppStoreServerLibrary\Models\MessageState;
 use AppStoreServerLibrary\Models\NotificationHistoryRequest;
 use AppStoreServerLibrary\Models\NotificationHistoryResponseItem;
 use AppStoreServerLibrary\Models\NotificationTypeV2;
+use AppStoreServerLibrary\Models\OneTimeBuyLineItem;
 use AppStoreServerLibrary\Models\OrderLookupStatus;
 use AppStoreServerLibrary\Models\Platform;
 use AppStoreServerLibrary\Models\PlayTime;
+use AppStoreServerLibrary\Models\RefundLineItem;
 use AppStoreServerLibrary\Models\RefundPreference;
 use AppStoreServerLibrary\Models\RefundPreferenceV1;
 use AppStoreServerLibrary\Models\SendAttemptItem;
 use AppStoreServerLibrary\Models\SendAttemptResult;
 use AppStoreServerLibrary\Models\Status;
+use AppStoreServerLibrary\Models\SubscriptionBuyLineItem;
 use AppStoreServerLibrary\Models\SubscriptionGroupIdentifierItem;
 use AppStoreServerLibrary\Models\Subtype;
 use AppStoreServerLibrary\Models\TransactionHistoryRequest;
@@ -1043,6 +1047,20 @@ class AppStoreServerAPIClientTest extends TestCase
             expectedUrl: "https://local-testing-base-url/inApps/v1/messaging/default/com.example.product/en-US",
         );
         $client->deleteDefaultMessage(productId: "com.example.product", locale: "en-US");
+    }
+
+    public function testSerializeExternalPurchaseReport():void
+    {
+        $body = file_get_contents(__DIR__ . "/resources/models/externalPurchasereport.json");
+        $report = ExternalPurchaseReport::fromObject(json_decode($body));
+
+        self::assertInstanceOf(OneTimeBuyLineItem::class, $report->getLineItems()[0]);
+        self::assertInstanceOf(SubscriptionBuyLineItem::class, $report->getLineItems()[1]);
+        self::assertInstanceOf(RefundLineItem::class, $report->getLineItems()[2]);
+
+        $expected = json_decode($body, true);
+        $actual = json_decode(json_encode($report), true);
+        self::assertArraysAreEqual($expected, $actual);
     }
 
     private function getSigningKey(): string

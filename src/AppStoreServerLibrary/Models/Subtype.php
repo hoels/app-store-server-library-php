@@ -10,10 +10,12 @@ namespace AppStoreServerLibrary\Models;
 enum Subtype: string
 {
     case ACCEPTED = "ACCEPTED";
+    case ACTIVE_TOKEN_REMINDER = "ACTIVE_TOKEN_REMINDER";
     case AUTO_RENEW_DISABLED = "AUTO_RENEW_DISABLED";
     case AUTO_RENEW_ENABLED = "AUTO_RENEW_ENABLED";
     case BILLING_RECOVERY = "BILLING_RECOVERY";
     case BILLING_RETRY = "BILLING_RETRY";
+    case CREATED = "CREATED";
     case DOWNGRADE = "DOWNGRADE";
     case FAILURE = "FAILURE";
     case GRACE_PERIOD = "GRACE_PERIOD";
