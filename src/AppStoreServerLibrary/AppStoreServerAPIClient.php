@@ -12,6 +12,7 @@ use AppStoreServerLibrary\Models\DefaultConfigurationRequest;
 use AppStoreServerLibrary\Models\Environment;
 use AppStoreServerLibrary\Models\ExtendRenewalDateRequest;
 use AppStoreServerLibrary\Models\ExtendRenewalDateResponse;
+use AppStoreServerLibrary\Models\ExternalPurchaseReport;
 use AppStoreServerLibrary\Models\GetImageListResponse;
 use AppStoreServerLibrary\Models\GetMessageListResponse;
 use AppStoreServerLibrary\Models\HistoryResponse;
@@ -22,6 +23,7 @@ use AppStoreServerLibrary\Models\NotificationHistoryRequest;
 use AppStoreServerLibrary\Models\NotificationHistoryResponse;
 use AppStoreServerLibrary\Models\OrderLookupResponse;
 use AppStoreServerLibrary\Models\RefundHistoryResponse;
+use AppStoreServerLibrary\Models\SendReportSuccessResponse;
 use AppStoreServerLibrary\Models\SendTestNotificationResponse;
 use AppStoreServerLibrary\Models\Status;
 use AppStoreServerLibrary\Models\StatusResponse;
@@ -700,5 +702,22 @@ class AppStoreServerAPIClient
             queryParameters: [],
             body: null,
         );
+    }
+
+    /**
+     * Report required information about external purchase tokens and associated transactions.
+     * https://developer.apple.com/documentation/externalpurchaseserverapi/send-external-purchase-report
+     *
+     * @throws APIException If a response was returned indicating the request could not be processed
+     */
+    public function sendExternalPurchaseReport(ExternalPurchaseReport $report): SendReportSuccessResponse
+    {
+        $responseBody = $this->makeRequest(
+            path: "/externalPurchase/v1/reports",
+            method: "PUT",
+            queryParameters: [],
+            body: $report,
+        );
+        return SendReportSuccessResponse::fromObject((object)$responseBody);
     }
 }
