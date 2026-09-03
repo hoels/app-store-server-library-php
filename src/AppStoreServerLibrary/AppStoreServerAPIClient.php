@@ -175,7 +175,7 @@ class AppStoreServerAPIClient
      * renewal date for all of its active subscribers.
      * @return MassExtendRenewalDateResponse A response that indicates the server successfully received the
      * subscription-renewal-date extension request.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function extendRenewalDateForAllActiveSubscribers(
         MassExtendRenewalDateRequest $massExtendRenewalDateRequest
@@ -199,7 +199,7 @@ class AppStoreServerAPIClient
      * subscription-renewal-extension data.
      * @return ExtendRenewalDateResponse A response that indicates whether an individual renewal-date extension
      * succeeded, and related details.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function extendSubscriptionRenewalDate(
         string $originalTransactionId,
@@ -224,7 +224,7 @@ class AppStoreServerAPIClient
      * response. Your query may specify more than one status query parameter.
      * @return StatusResponse A response that contains status information for all of a customer's auto-renewable
      * subscriptions in your app.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function getAllSubscriptionStatuses(string $transactionId, ?array $status = null): StatusResponse
     {
@@ -252,7 +252,7 @@ class AppStoreServerAPIClient
      * include a revision token. Use the revision token from the previous RefundHistoryResponse.
      * @return RefundHistoryResponse A response that contains status information for all of a customer's auto-renewable
      * subscriptions in your app.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function getRefundHistory(string $transactionId, ?string $revision = null): RefundHistoryResponse
     {
@@ -281,7 +281,7 @@ class AppStoreServerAPIClient
      * renewal-date extension for.
      * @return MassExtendRenewalDateStatusResponse A response that indicates the current status of a request to extend
      * the subscription renewal date to all eligible subscribers.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function getStatusOfSubscriptionRenewalDateExtensions(
         string $requestIdentifier,
@@ -304,7 +304,7 @@ class AppStoreServerAPIClient
      * endpoint
      * @return CheckTestNotificationResponse A response that contains the contents of the test notification sent by the
      * App Store server and the result from your server.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function getTestNotificationStatus(string $testNotificationToken): CheckTestNotificationResponse
     {
@@ -328,7 +328,7 @@ class AppStoreServerAPIClient
      * dates, and optional query constraints.
      * @return NotificationHistoryResponse A response that contains the App Store Server Notifications history for your
      * app.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function getNotificationHistory(
         ?string $paginationToken,
@@ -362,7 +362,7 @@ class AppStoreServerAPIClient
      * @param GetTransactionHistoryVersion $version The version of the Get Transaction History endpoint to use. V2 is
      * recommended.
      * @return HistoryResponse A response that contains the customer's transaction history for an app.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function getTransactionHistory(
         string $transactionId,
@@ -419,7 +419,7 @@ class AppStoreServerAPIClient
      * @param string $transactionId The identifier of a transaction that belongs to the customer, and which may be an
      * original transaction identifier.
      * @return TransactionInfoResponse A response that contains signed transaction information for a single transaction.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function getTransactionInfo(string $transactionId): TransactionInfoResponse
     {
@@ -439,7 +439,7 @@ class AppStoreServerAPIClient
      * @param string $orderId The order ID for in-app purchases that belong to the customer.
      * @return OrderLookupResponse A response that includes the order lookup status and an array of signed transactions
      * for the in-app purchases in the order.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function lookUpOrderId(string $orderId): OrderLookupResponse
     {
@@ -457,7 +457,7 @@ class AppStoreServerAPIClient
      * https://developer.apple.com/documentation/appstoreserverapi/request_a_test_notification
      *
      * @return SendTestNotificationResponse A response that contains the test notification token.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function requestTestNotification(): SendTestNotificationResponse
     {
@@ -478,7 +478,7 @@ class AppStoreServerAPIClient
      * @param string $transactionId The transaction identifier for which you're providing consumption information. You
      * receive this identifier in the CONSUMPTION_REQUEST notification the App Store sends to your server.
      * @param ConsumptionRequestV1 $consumptionRequest The request body containing consumption information.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      *
      * @deprecated Use {@see sendConsumptionInformation} instead.
      */
@@ -501,7 +501,7 @@ class AppStoreServerAPIClient
      * receive this identifier in the CONSUMPTION_REQUEST notification the App Store sends to your server's App Store
      * Server Notifications V2 endpoint.
      * @param ConsumptionRequest $consumptionRequest The request body containing consumption information.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function sendConsumptionInformation(string $transactionId, ConsumptionRequest $consumptionRequest): void
     {
@@ -522,7 +522,7 @@ class AppStoreServerAPIClient
      * account token update.
      * @param UpdateAppAccountTokenRequest $updateAppAccountTokenRequest The request body that contains a valid app
      * account token value.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function setAppAccountToken(
         string $originalTransactionId,
@@ -543,7 +543,7 @@ class AppStoreServerAPIClient
      * @param string $transactionId Any originalTransactionId, transactionId or appTransactionId that belongs to the
      * customer for your app.
      * @return AppTransactionInfoResponse A response that contains signed app transaction information for a customer.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function getAppTransactionInfo(string $transactionId): AppTransactionInfoResponse
     {
@@ -562,7 +562,7 @@ class AppStoreServerAPIClient
      *
      * @param string $imageIdentifier A UUID you provide to uniquely identify the image you upload.
      * @param string $image The binary data of the image to upload.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function uploadImage(string $imageIdentifier, string $image): void
     {
@@ -580,7 +580,7 @@ class AppStoreServerAPIClient
      * https://developer.apple.com/documentation/retentionmessaging/delete-image
      *
      * @param string $imageIdentifier The identifier of the image to delete.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function deleteImage(string $imageIdentifier): void
     {
@@ -597,7 +597,7 @@ class AppStoreServerAPIClient
      * https://developer.apple.com/documentation/retentionmessaging/get-image-list
      *
      * @return GetImageListResponse A response that contains status information for all images.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function getImageList(): GetImageListResponse
     {
@@ -616,7 +616,7 @@ class AppStoreServerAPIClient
      *
      * @param string $messageIdentifier A UUID you provide to uniquely identify the message you upload.
      * @param UploadMessageRequestBody $uploadMessageRequestBody The message text to upload.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function uploadMessage(string $messageIdentifier, UploadMessageRequestBody $uploadMessageRequestBody): void
     {
@@ -633,7 +633,7 @@ class AppStoreServerAPIClient
      * https://developer.apple.com/documentation/retentionmessaging/delete-message
      *
      * @param string $messageIdentifier The identifier of the message to delete.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function deleteMessage(string $messageIdentifier): void
     {
@@ -650,7 +650,7 @@ class AppStoreServerAPIClient
      * https://developer.apple.com/documentation/retentionmessaging/get-message-list
      *
      * @return GetMessageListResponse A response that contains status information for all messages.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function getMessageList(): GetMessageListResponse
     {
@@ -671,7 +671,7 @@ class AppStoreServerAPIClient
      * @param string $locale The locale for the default configuration.
      * @param DefaultConfigurationRequest $defaultConfigurationRequest The request body that includes the message
      * identifier to configure as the default message.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function configureDefaultMessage(
         string $productId,
@@ -692,7 +692,7 @@ class AppStoreServerAPIClient
      *
      * @param string $productId The product ID of the default message configuration.
      * @param string $locale The locale of the default message configuration.
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function deleteDefaultMessage(string $productId, string $locale): void
     {
@@ -708,15 +708,17 @@ class AppStoreServerAPIClient
      * Report required information about external purchase tokens and associated transactions.
      * https://developer.apple.com/documentation/externalpurchaseserverapi/send-external-purchase-report
      *
-     * @throws APIException If a response was returned indicating the request could not be processed
+     * @param ExternalPurchaseReport $externalPurchaseReport The request body that contains the report information.
+     * @throws APIException If a response was returned indicating the request could not be processed.
      */
-    public function sendExternalPurchaseReport(ExternalPurchaseReport $report): SendReportSuccessResponse
-    {
+    public function sendExternalPurchaseReport(
+        ExternalPurchaseReport $externalPurchaseReport,
+    ): SendReportSuccessResponse {
         $responseBody = $this->makeRequest(
             path: "/externalPurchase/v1/reports",
             method: "PUT",
             queryParameters: [],
-            body: $report,
+            body: $externalPurchaseReport,
         );
         return SendReportSuccessResponse::fromObject((object)$responseBody);
     }

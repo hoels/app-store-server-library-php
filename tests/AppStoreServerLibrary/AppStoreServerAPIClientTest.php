@@ -16,6 +16,7 @@ use AppStoreServerLibrary\Models\Environment;
 use AppStoreServerLibrary\Models\ExtendReasonCode;
 use AppStoreServerLibrary\Models\ExtendRenewalDateRequest;
 use AppStoreServerLibrary\Models\ExternalPurchaseReport;
+use AppStoreServerLibrary\Models\ExternalPurchaseStatus;
 use AppStoreServerLibrary\Models\ImageState;
 use AppStoreServerLibrary\Models\InAppOwnershipType;
 use AppStoreServerLibrary\Models\LastTransactionsItem;
@@ -37,6 +38,7 @@ use AppStoreServerLibrary\Models\SendAttemptItem;
 use AppStoreServerLibrary\Models\SendAttemptResult;
 use AppStoreServerLibrary\Models\Status;
 use AppStoreServerLibrary\Models\SubscriptionBuyLineItem;
+use AppStoreServerLibrary\Models\SubscriptionEvent;
 use AppStoreServerLibrary\Models\SubscriptionGroupIdentifierItem;
 use AppStoreServerLibrary\Models\Subtype;
 use AppStoreServerLibrary\Models\TransactionHistoryRequest;
@@ -1049,18 +1051,141 @@ class AppStoreServerAPIClientTest extends TestCase
         $client->deleteDefaultMessage(productId: "com.example.product", locale: "en-US");
     }
 
-    public function testSerializeExternalPurchaseReport():void
+    /**
+     * @throws APIException
+     */
+    public function testSendExternalPurchaseReport(): void
     {
-        $body = file_get_contents(__DIR__ . "/resources/models/externalPurchasereport.json");
-        $report = ExternalPurchaseReport::fromObject(json_decode($body));
-
-        self::assertInstanceOf(OneTimeBuyLineItem::class, $report->getLineItems()[0]);
-        self::assertInstanceOf(SubscriptionBuyLineItem::class, $report->getLineItems()[1]);
-        self::assertInstanceOf(RefundLineItem::class, $report->getLineItems()[2]);
-
-        $expected = json_decode($body, true);
-        $actual = json_decode(json_encode($report), true);
-        self::assertArraysAreEqual($expected, $actual);
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "PUT",
+            expectedUrl: "https://local-testing-base-url/externalPurchase/v1/reports",
+            expectedJson: [
+                "requestIdentifier" => "0a05e4aa-4e86-49c2-9468-a04f0ef68f75",
+                "externalPurchaseId" => "722b276a-7005-4888-b52c-77f440edb91c",
+                "status" => "LINE_ITEM",
+                "lineItems" => [
+                    [
+                        "eventType" => "BUY",
+                        "productType" => "ONE_TIME_BUY",
+                        "lineItemId" => "aaaa",
+                        "creationDate" => 12345678,
+                        "pricingCurrency" => "EUR",
+                        "reportingCurrency" => "EUR",
+                        "amountTaxExclusive" => 900,
+                        "amountTaxInclusive" => 1000,
+                        "netAmountTaxExclusive" => 850,
+                        "taxAmount" => 100,
+                        "taxCountry" => "NL",
+                        "productIdentifier" => "com.example.iap",
+                        "quantity" => 1,
+                        "restatement" => false,
+                        "erroneouslySubmitted" => false,
+                        "exchangeRate" => 1.1,
+                    ],
+                    [
+                        "eventType" => "BUY",
+                        "productType" => "SUBSCRIPTION",
+                        "lineItemId" => "bbbb",
+                        "creationDate" => 12345678,
+                        "subscriptionEvent" => "SUBSCRIPTION_START",
+                        "subscriptionStartDate" => 12345000,
+                        "subscriptionEndDate" => 12346000,
+                        "subscriptionDaysOfPaidService" => 10,
+                        "pricingCurrency" => "EUR",
+                        "reportingCurrency" => "EUR",
+                        "amountTaxExclusive" => 900,
+                        "amountTaxInclusive" => 1000,
+                        "netAmountTaxExclusive" => 850,
+                        "taxAmount" => 100,
+                        "taxCountry" => "NL",
+                        "productIdentifier" => "com.example.subscription",
+                        "quantity" => 1,
+                        "referenceLineItemId" => "cccc",
+                        "restatement" => false,
+                        "erroneouslySubmitted" => false,
+                        "exchangeRate" => 1.1,
+                    ],
+                    [
+                        "eventType" => "REFUND",
+                        "lineItemId" => "eeee",
+                        "referenceLineItemId" => "ffff",
+                        "creationDate" => 12345678,
+                        "pricingCurrency" => "EUR",
+                        "reportingCurrency" => "EUR",
+                        "amountTaxExclusive" => 900,
+                        "amountTaxInclusive" => 1000,
+                        "netAmountTaxExclusive" => 850,
+                        "taxAmount" => 100,
+                        "taxCountry" => "NL",
+                        "restatement" => false,
+                        "erroneouslySubmitted" => false,
+                        "exchangeRate" => 1.1,
+                    ],
+                ],
+            ],
+        );
+        $client->sendExternalPurchaseReport(
+            new ExternalPurchaseReport(
+                requestIdentifier: "0a05e4aa-4e86-49c2-9468-a04f0ef68f75",
+                externalPurchaseId: "722b276a-7005-4888-b52c-77f440edb91c",
+                status: ExternalPurchaseStatus::LINE_ITEM,
+                lineItems: [
+                    new OneTimeBuyLineItem(
+                        lineItemId: "aaaa",
+                        creationDate: 12345678,
+                        pricingCurrency: "EUR",
+                        reportingCurrency: "EUR",
+                        amountTaxExclusive: 900,
+                        amountTaxInclusive: 1000,
+                        netAmountTaxExclusive: 850,
+                        taxAmount: 100,
+                        taxCountry: "NL",
+                        productIdentifier: "com.example.iap",
+                        quantity: 1,
+                        restatement: false,
+                        erroneouslySubmitted: false,
+                        exchangeRate: 1.1,
+                    ),
+                    new SubscriptionBuyLineItem(
+                        lineItemId: "bbbb",
+                        creationDate: 12345678,
+                        subscriptionEvent: SubscriptionEvent::SUBSCRIPTION_START,
+                        subscriptionStartDate: 12345000,
+                        subscriptionEndDate: 12346000,
+                        subscriptionDaysOfPaidService: 10,
+                        pricingCurrency: "EUR",
+                        reportingCurrency: "EUR",
+                        amountTaxExclusive: 900,
+                        amountTaxInclusive: 1000,
+                        netAmountTaxExclusive: 850,
+                        taxAmount: 100,
+                        taxCountry: "NL",
+                        productIdentifier: "com.example.subscription",
+                        quantity: 1,
+                        referenceLineItemId: "cccc",
+                        restatement: false,
+                        erroneouslySubmitted: false,
+                        exchangeRate: 1.1,
+                    ),
+                    new RefundLineItem(
+                        lineItemId: "eeee",
+                        referenceLineItemId: "ffff",
+                        creationDate: 12345678,
+                        pricingCurrency: "EUR",
+                        reportingCurrency: "EUR",
+                        amountTaxExclusive: 900,
+                        amountTaxInclusive: 1000,
+                        netAmountTaxExclusive: 850,
+                        taxAmount: 100,
+                        taxCountry: "NL",
+                        restatement: false,
+                        erroneouslySubmitted: false,
+                        exchangeRate: 1.1,
+                    ),
+                ],
+            )
+        );
     }
 
     private function getSigningKey(): string

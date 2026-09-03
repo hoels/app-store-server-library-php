@@ -2,9 +2,9 @@
 
 namespace AppStoreServerLibrary\Models;
 
+use AppStoreServerLibrary\Models\ExternalPurchaseReport\EventType;
+use AppStoreServerLibrary\Models\ExternalPurchaseReport\ProductType;
 use JsonSerializable;
-use stdClass;
-use ValueError;
 
 /**
  * The line item that indicates a one-time charge transaction.
@@ -13,30 +13,27 @@ use ValueError;
  */
 class OneTimeBuyLineItem implements JsonSerializable
 {
+    private readonly EventType $eventType;
+    private readonly ProductType $productType;
+    
     public function __construct(
-        private readonly ?string $lineItemId,
-        private readonly ?int $creationDate,
-        private readonly ?string $pricingCurrency,
-        private readonly ?string $reportingCurrency,
-        private readonly ?int $amountTaxExclusive,
-        private readonly ?int $amountTaxInclusive,
-        private readonly ?int $netAmountTaxExclusive,
-        private readonly ?int $taxAmount,
-        private readonly ?string $taxCountry,
-        private readonly ?string $productIdentifier,
-        private readonly ?int $quantity,
-        private readonly ?float $exchangeRate = null,
+        private readonly string $lineItemId,
+        private readonly int $creationDate,
+        private readonly string $pricingCurrency,
+        private readonly string $reportingCurrency,
+        private readonly int $amountTaxExclusive,
+        private readonly int $amountTaxInclusive,
+        private readonly int $netAmountTaxExclusive,
+        private readonly int $taxAmount,
+        private readonly string $taxCountry,
+        private readonly string $productIdentifier,
+        private readonly int $quantity,
         private readonly bool $restatement = false,
         private readonly bool $erroneouslySubmitted = false,
-        private readonly string $eventType = 'BUY',
-        private readonly string $productType = 'ONE_TIME_BUY',
+        private readonly ?float $exchangeRate = null,
     ) {
-        if ($eventType !== 'BUY') {
-            throw new ValueError('eventType must be "BUY"');
-        }
-        if ($productType !== 'ONE_TIME_BUY') {
-            throw new ValueError('productType must be "ONE_TIME_BUY"');
-        }
+        $this->eventType = EventType::BUY;
+        $this->productType = ProductType::ONE_TIME_BUY;
     }
 
     /**
@@ -45,7 +42,7 @@ class OneTimeBuyLineItem implements JsonSerializable
      *
      * https://developer.apple.com/documentation/externalpurchaseserverapi/lineitemid
      */
-    public function getLineItemId(): ?string
+    public function getLineItemId(): string
     {
         return $this->lineItemId;
     }
@@ -55,9 +52,30 @@ class OneTimeBuyLineItem implements JsonSerializable
      *
      * https://developer.apple.com/documentation/externalpurchaseserverapi/creationdate
      */
-    public function getCreationDate(): ?int
+    public function getCreationDate(): int
     {
         return $this->creationDate;
+    }
+
+    /**
+     * Set to true to indicate that this line item is correcting (restating) a line item that you previously submitted.
+     *
+     * https://developer.apple.com/documentation/externalpurchaseserverapi/restatement
+     */
+    public function getRestatement(): bool
+    {
+        return $this->restatement;
+    }
+
+    /**
+     * Set to true to indicate that you previously submitted the line item erroneously. Set the restatement field to
+     * true also.
+     *
+     * https://developer.apple.com/documentation/externalpurchaseserverapi/erroneouslysubmitted
+     */
+    public function getErroneouslySubmitted(): bool
+    {
+        return $this->erroneouslySubmitted;
     }
 
     /**
@@ -65,7 +83,7 @@ class OneTimeBuyLineItem implements JsonSerializable
      *
      * https://developer.apple.com/documentation/externalpurchaseserverapi/pricingcurrency
      */
-    public function getPricingCurrency(): ?string
+    public function getPricingCurrency(): string
     {
         return $this->pricingCurrency;
     }
@@ -76,80 +94,9 @@ class OneTimeBuyLineItem implements JsonSerializable
      *
      * https://developer.apple.com/documentation/externalpurchaseserverapi/reportingcurrency
      */
-    public function getReportingCurrency(): ?string
+    public function getReportingCurrency(): string
     {
         return $this->reportingCurrency;
-    }
-
-    /**
-     * The amount that the customer paid, excluding taxes, that you state in milli-units of the reporting currency.
-     *
-     * https://developer.apple.com/documentation/externalpurchaseserverapi/amounttaxexclusive
-     */
-    public function getAmountTaxExclusive(): ?int
-    {
-        return $this->amountTaxExclusive;
-    }
-
-    /**
-     * The amount that the customer paid, including taxes, that you state in milli-units of the reporting currency.
-     *
-     * https://developer.apple.com/documentation/externalpurchaseserverapi/amounttaxinclusive
-     */
-    public function getAmountTaxInclusive(): ?int
-    {
-        return $this->amountTaxInclusive;
-    }
-
-    /**
-     * The net amount the customer was charged, accurate to the current report, that you state in milli-units of the
-     * reporting currency. This amount excludes tax, and accounts for all refunds and restatements.
-     *
-     * https://developer.apple.com/documentation/externalpurchaseserverapi/netamounttaxexclusive
-     */
-    public function getNetAmountTaxExclusive(): ?int
-    {
-        return $this->netAmountTaxExclusive;
-    }
-
-    /**
-     * The amount the customer paid in taxes, that you state in milli-units of the reporting currency.
-     *
-     * https://developer.apple.com/documentation/externalpurchaseserverapi/taxamount
-     */
-    public function getTaxAmount(): ?int
-    {
-        return $this->taxAmount;
-    }
-
-    /**
-     * The country code of the country for which taxes were paid on the purchase.
-     *
-     * https://developer.apple.com/documentation/externalpurchaseserverapi/taxcountry
-     */
-    public function getTaxCountry(): ?string
-    {
-        return $this->taxCountry;
-    }
-
-    /**
-     * A string that uniquely identifies the product.
-     *
-     * https://developer.apple.com/documentation/externalpurchaseserverapi/productidentifier
-     */
-    public function getProductIdentifier(): ?string
-    {
-        return $this->productIdentifier;
-    }
-
-    /**
-     * The quantity of the product the customer purchased.
-     *
-     * https://developer.apple.com/documentation/externalpurchaseserverapi/quantity
-     */
-    public function getQuantity(): ?int
-    {
-        return $this->quantity;
     }
 
     /**
@@ -164,99 +111,94 @@ class OneTimeBuyLineItem implements JsonSerializable
     }
 
     /**
-     * Set to true to indicate that this line item is correcting (restating) a line item that you previously submitted.
-     * For more information, see Reporting corrections. Default: false
+     * The amount that the customer paid, excluding taxes, that you state in milli-units of the reporting currency.
      *
-     * https://developer.apple.com/documentation/externalpurchaseserverapi/restatement
+     * https://developer.apple.com/documentation/externalpurchaseserverapi/amounttaxexclusive
      */
-    public function getRestatement(): bool
+    public function getAmountTaxExclusive(): int
     {
-        return $this->restatement;
+        return $this->amountTaxExclusive;
     }
 
     /**
-     * Set to true to indicate that you previously submitted the line item erroneously. Set the restatement field to
-     * true also. For more information, see Reporting corrections. Default: false
+     * The amount that the customer paid, including taxes, that you state in milli-units of the reporting currency.
      *
-     * https://developer.apple.com/documentation/externalpurchaseserverapi/erroneouslysubmitted
+     * https://developer.apple.com/documentation/externalpurchaseserverapi/amounttaxinclusive
      */
-    public function getErroneouslySubmitted(): bool
+    public function getAmountTaxInclusive(): int
     {
-        return $this->erroneouslySubmitted;
+        return $this->amountTaxInclusive;
     }
 
     /**
-     * Must be BUY.
+     * The net amount the customer was charged, accurate to the current report, that you state in milli-units of the
+     * reporting currency. This amount excludes tax, and accounts for all refunds and restatements.
+     *
+     * https://developer.apple.com/documentation/externalpurchaseserverapi/netamounttaxexclusive
+     */
+    public function getNetAmountTaxExclusive(): int
+    {
+        return $this->netAmountTaxExclusive;
+    }
+
+    /**
+     * The amount the customer paid in taxes, that you state in milli-units of the reporting currency.
+     *
+     * https://developer.apple.com/documentation/externalpurchaseserverapi/taxamount
+     */
+    public function getTaxAmount(): int
+    {
+        return $this->taxAmount;
+    }
+
+    /**
+     * The country code of the country for which taxes were paid on the purchase.
+     *
+     * https://developer.apple.com/documentation/externalpurchaseserverapi/taxcountry
+     */
+    public function getTaxCountry(): string
+    {
+        return $this->taxCountry;
+    }
+
+    /**
+     * A string that uniquely identifies the product.
+     *
+     * https://developer.apple.com/documentation/externalpurchaseserverapi/productidentifier
+     */
+    public function getProductIdentifier(): string
+    {
+        return $this->productIdentifier;
+    }
+
+    /**
+     * The quantity of the product the customer purchased.
+     *
+     * https://developer.apple.com/documentation/externalpurchaseserverapi/quantity
+     */
+    public function getQuantity(): int
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * Always BUY.
      *
      * https://developer.apple.com/documentation/externalpurchaseserverapi/eventtype
      */
-    public function getEventType(): string
+    public function getEventType(): EventType
     {
         return $this->eventType;
     }
 
     /**
-     * Must be ONE_TIME_BUY.
+     * Always ONE_TIME_BUY.
      *
      * https://developer.apple.com/documentation/externalpurchaseserverapi/producttype
      */
-    public function getProductType(): string
+    public function getProductType(): ProductType
     {
         return $this->productType;
-    }
-
-    public static function fromObject(stdClass $obj): OneTimeBuyLineItem
-    {
-        return new OneTimeBuyLineItem(
-            lineItemId: property_exists($obj, "lineItemId")
-                && is_string($obj->lineItemId)
-                ? $obj->lineItemId : null,
-            creationDate: property_exists($obj, "creationDate")
-                && is_int($obj->creationDate)
-                ? $obj->creationDate : null,
-            pricingCurrency: property_exists($obj, "pricingCurrency")
-                && is_string($obj->pricingCurrency)
-                ? $obj->pricingCurrency : null,
-            reportingCurrency: property_exists($obj, "reportingCurrency")
-                && is_string($obj->reportingCurrency)
-                ? $obj->reportingCurrency : null,
-            amountTaxExclusive: property_exists($obj, "amountTaxExclusive")
-                && is_int($obj->amountTaxExclusive)
-                ? $obj->amountTaxExclusive : null,
-            amountTaxInclusive: property_exists($obj, "amountTaxInclusive")
-                && is_int($obj->amountTaxInclusive)
-                ? $obj->amountTaxInclusive : null,
-            netAmountTaxExclusive: property_exists($obj, "netAmountTaxExclusive")
-                && is_int($obj->netAmountTaxExclusive)
-                ? $obj->netAmountTaxExclusive : null,
-            taxAmount: property_exists($obj, "taxAmount")
-                && is_int($obj->taxAmount)
-                ? $obj->taxAmount : null,
-            taxCountry: property_exists($obj, "taxCountry")
-                && is_string($obj->taxCountry)
-                ? $obj->taxCountry : null,
-            productIdentifier: property_exists($obj, "productIdentifier")
-                && is_string($obj->productIdentifier)
-                ? $obj->productIdentifier : null,
-            quantity: property_exists($obj, "quantity")
-                && is_int($obj->quantity)
-                ? $obj->quantity : null,
-            exchangeRate: property_exists($obj, "exchangeRate")
-                && is_float($obj->exchangeRate)
-                ? $obj->exchangeRate : null,
-            restatement: property_exists($obj, "restatement")
-                && is_bool($obj->restatement)
-                ? $obj->restatement : false,
-            erroneouslySubmitted: property_exists($obj, "erroneouslySubmitted")
-                && is_bool($obj->erroneouslySubmitted)
-                ? $obj->erroneouslySubmitted : false,
-            eventType: property_exists($obj, "eventType")
-                && is_string($obj->eventType)
-                ? $obj->eventType : 'BUY',
-            productType: property_exists($obj, "productType")
-                && is_string($obj->productType)
-                ? $obj->productType : 'ONE_TIME_BUY',
-        );
     }
 
     /**
