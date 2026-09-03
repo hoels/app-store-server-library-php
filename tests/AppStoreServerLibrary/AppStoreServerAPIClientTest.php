@@ -468,6 +468,19 @@ class AppStoreServerAPIClientTest extends TestCase
     /**
      * @throws APIException
      */
+    public function testFinishTransaction(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "POST",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/1234/finish",
+        );
+        $client->finishTransaction(transactionId: "1234");
+    }
+
+    /**
+     * @throws APIException
+     */
     public function testRequestTestNotification(): void
     {
         $client = $this->getClientWithBodyFromFile(

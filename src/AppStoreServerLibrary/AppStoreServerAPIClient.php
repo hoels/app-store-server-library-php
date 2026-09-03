@@ -453,6 +453,23 @@ class AppStoreServerAPIClient
     }
 
     /**
+     * SNotifies the App Store server that your system has finished processing the customer’s transaction.
+     * https://developer.apple.com/documentation/appstoreserverapi/finish-transaction
+     *
+     * @param string $transactionId The transaction identifier of the transaction to mark as finished.
+     * @throws APIException If a response was returned indicating the request could not be processed.
+     */
+    public function finishTransaction(string $transactionId): void
+    {
+        $this->makeRequest(
+            path: "/inApps/v1/transactions/$transactionId/finish",
+            method: "POST",
+            queryParameters: [],
+            body: null
+        );
+    }
+
+    /**
      * Ask App Store Server Notifications to send a test notification to your server.
      * https://developer.apple.com/documentation/appstoreserverapi/request_a_test_notification
      *
