@@ -9,6 +9,7 @@ use AppStoreServerLibrary\Models\CheckTestNotificationResponse;
 use AppStoreServerLibrary\Models\ConsumptionRequest;
 use AppStoreServerLibrary\Models\ConsumptionRequestV1;
 use AppStoreServerLibrary\Models\DefaultConfigurationRequest;
+use AppStoreServerLibrary\Models\DefaultConfigurationResponse;
 use AppStoreServerLibrary\Models\Environment;
 use AppStoreServerLibrary\Models\ExtendRenewalDateRequest;
 use AppStoreServerLibrary\Models\ExtendRenewalDateResponse;
@@ -23,6 +24,11 @@ use AppStoreServerLibrary\Models\MassExtendRenewalDateStatusResponse;
 use AppStoreServerLibrary\Models\NotificationHistoryRequest;
 use AppStoreServerLibrary\Models\NotificationHistoryResponse;
 use AppStoreServerLibrary\Models\OrderLookupResponse;
+use AppStoreServerLibrary\Models\PerformanceTestRequest;
+use AppStoreServerLibrary\Models\PerformanceTestResponse;
+use AppStoreServerLibrary\Models\PerformanceTestResultResponse;
+use AppStoreServerLibrary\Models\RealtimeUrlRequest;
+use AppStoreServerLibrary\Models\RealtimeUrlResponse;
 use AppStoreServerLibrary\Models\RefundHistoryResponse;
 use AppStoreServerLibrary\Models\SendReportSuccessResponse;
 use AppStoreServerLibrary\Models\SendTestNotificationResponse;
@@ -725,6 +731,117 @@ class AppStoreServerAPIClient
             queryParameters: [],
             body: null,
         );
+    }
+
+    /**
+     * Gets the default message for a specific product in a specific locale, if it’s configured.
+     * https://developer.apple.com/documentation/retentionmessaging/get-default-message
+     *
+     * @param string $productId The product identifier of the message.
+     * @param string $locale The locale of the message.
+     * @return DefaultConfigurationResponse The response body that contains the default configuration information.
+     * @throws APIException If a response was returned indicating the request could not be processed.
+     */
+    public function getDefaultMessage(string $productId, string $locale): DefaultConfigurationResponse
+    {
+        $responseBody = $this->makeRequest(
+            path: "/inApps/v1/messaging/default/$productId/$locale",
+            method: "GET",
+            queryParameters: [],
+            body: null
+        );
+        return DefaultConfigurationResponse::fromObject((object)$responseBody);
+    }
+
+    /**
+     * Configures the URL for your Get Retention Message endpoint in the sandbox and production environments.
+     * https://developer.apple.com/documentation/retentionmessaging/configure-realtime-url
+     *
+     * @param RealtimeUrlRequest $realtimeUrlRequest The request body that includes your endpoint’s URL.
+     * @throws APIException If a response was returned indicating the request could not be processed.
+     */
+    public function configureRealtimeUrl(
+        RealtimeUrlRequest $realtimeUrlRequest,
+    ): void {
+        $this->makeRequest(
+            path: "/inApps/v1/messaging/realtime/url",
+            method: "PUT",
+            queryParameters: [],
+            body: $realtimeUrlRequest,
+        );
+    }
+
+    /**
+     * Deletes the URL for your Get Retention Message endpoint, in the sandbox or production environments.
+     * https://developer.apple.com/documentation/retentionmessaging/delete-realtime-url
+     *
+     * @throws APIException If a response was returned indicating the request could not be processed.
+     */
+    public function deleteRealtimeUrl(): void
+    {
+        $this->makeRequest(
+            path: "/inApps/v1/messaging/realtime/url",
+            method: "DELETE",
+            queryParameters: [],
+            body: null,
+        );
+    }
+
+    /**
+     * Gets the URL for real-time messages that points to your Get Retention Message endpoint, which you previously
+     * configured.
+     * https://developer.apple.com/documentation/retentionmessaging/get-realtime-url
+     *
+     * @return RealtimeUrlResponse The response body that contains the URL for your Get Retention Message endpoint.
+     * @throws APIException If a response was returned indicating the request could not be processed.
+     */
+    public function getRealtimeUrl(): RealtimeUrlResponse
+    {
+        $responseBody = $this->makeRequest(
+            path: "/inApps/v1/messaging/realtime/url",
+            method: "GET",
+            queryParameters: [],
+            body: null,
+        );
+        return RealtimeUrlResponse::fromObject((object)$responseBody);
+    }
+
+    /**
+     * Initiates a performance test of your Get Retention Message endpoint in the sandbox environment.
+     * https://developer.apple.com/documentation/retentionmessaging/initiate-performance-test
+     *
+     * @param PerformanceTestRequest $performanceTestRequest The request body which specifies a transaction identifier
+     * of an In-App Purchase to use for this test.
+     * @return PerformanceTestResponse The performance test response object.
+     * @throws APIException If a response was returned indicating the request could not be processed.
+     */
+    public function initiatePerformanceTest(PerformanceTestRequest $performanceTestRequest): PerformanceTestResponse
+    {
+        $responseBody = $this->makeRequest(
+            path: "/inApps/v1/messaging/performanceTest",
+            method: "POST",
+            queryParameters: [],
+            body: $performanceTestRequest,
+        );
+        return PerformanceTestResponse::fromObject((object)$responseBody);
+    }
+
+    /**
+     * Gets the results of the performance test for the specified identifier.
+     * https://developer.apple.com/documentation/retentionmessaging/get-performance-test-results
+     *
+     * @return PerformanceTestResultResponse An object the API returns that describes the performance test results.
+     * @throws APIException If a response was returned indicating the request could not be processed.
+     */
+    public function getPerformanceTestResults(string $requestId): PerformanceTestResultResponse
+    {
+        $responseBody = $this->makeRequest(
+            path: "/inApps/v1/messaging/performanceTest/result/$requestId",
+            method: "GET",
+            queryParameters: [],
+            body: null,
+        );
+        return PerformanceTestResultResponse::fromObject((object)$responseBody);
     }
 
     /**

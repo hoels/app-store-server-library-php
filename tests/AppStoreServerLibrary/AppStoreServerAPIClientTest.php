@@ -6,6 +6,7 @@ use AppStoreServerLibrary\AppStoreServerAPIClient;
 use AppStoreServerLibrary\AppStoreServerAPIClient\APIError;
 use AppStoreServerLibrary\AppStoreServerAPIClient\APIException;
 use AppStoreServerLibrary\Models\AccountTenure;
+use AppStoreServerLibrary\Models\BulletPoint;
 use AppStoreServerLibrary\Models\ConsumptionRequest;
 use AppStoreServerLibrary\Models\ConsumptionRequestV1;
 use AppStoreServerLibrary\Models\ConsumptionStatus;
@@ -17,6 +18,7 @@ use AppStoreServerLibrary\Models\ExtendReasonCode;
 use AppStoreServerLibrary\Models\ExtendRenewalDateRequest;
 use AppStoreServerLibrary\Models\ExternalPurchaseReport;
 use AppStoreServerLibrary\Models\ExternalPurchaseStatus;
+use AppStoreServerLibrary\Models\HeaderPosition;
 use AppStoreServerLibrary\Models\ImageSize;
 use AppStoreServerLibrary\Models\ImageState;
 use AppStoreServerLibrary\Models\InAppOwnershipType;
@@ -30,8 +32,11 @@ use AppStoreServerLibrary\Models\NotificationHistoryResponseItem;
 use AppStoreServerLibrary\Models\NotificationTypeV2;
 use AppStoreServerLibrary\Models\OneTimeBuyLineItem;
 use AppStoreServerLibrary\Models\OrderLookupStatus;
+use AppStoreServerLibrary\Models\PerformanceTestRequest;
+use AppStoreServerLibrary\Models\PerformanceTestStatus;
 use AppStoreServerLibrary\Models\Platform;
 use AppStoreServerLibrary\Models\PlayTime;
+use AppStoreServerLibrary\Models\RealtimeUrlRequest;
 use AppStoreServerLibrary\Models\RefundLineItem;
 use AppStoreServerLibrary\Models\RefundPreference;
 use AppStoreServerLibrary\Models\RefundPreferenceV1;
@@ -46,6 +51,7 @@ use AppStoreServerLibrary\Models\TransactionHistoryRequest;
 use AppStoreServerLibrary\Models\TransactionHistoryRequest\Order;
 use AppStoreServerLibrary\Models\TransactionHistoryRequest\ProductType;
 use AppStoreServerLibrary\Models\UpdateAppAccountTokenRequest;
+use AppStoreServerLibrary\Models\UploadMessageImage;
 use AppStoreServerLibrary\Models\UploadMessageRequestBody;
 use AppStoreServerLibrary\Models\UserStatus;
 use Firebase\JWT\JWT;
@@ -952,6 +958,27 @@ class AppStoreServerAPIClientTest extends TestCase
     /**
      * @throws APIException
      */
+    public function testUploadImageWithImageSize(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "PUT",
+            expectedUrl:
+            "https://local-testing-base-url/inApps/v1/messaging/image/a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890",
+            expectedParams: ["imageSize" => ["FULL_SIZE"]],
+            expectedBody: "\x01\x02\x03",
+            expectedContentType: "image/png",
+        );
+        $client->uploadImage(
+            imageIdentifier: "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890",
+            image: "\x01\x02\x03",
+            imageSize: ImageSize::FULL_SIZE,
+        );
+    }
+
+    /**
+     * @throws APIException
+     */
     public function testDeleteImage(): void
     {
         $client = $this->getClientWithBody(
@@ -999,6 +1026,51 @@ class AppStoreServerAPIClientTest extends TestCase
         $client->uploadMessage(
             messageIdentifier: "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890",
             uploadMessageRequestBody: new UploadMessageRequestBody(header: "Header text", body: "Body text")
+        );
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testUploadMessageWithBulletPoints(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "PUT",
+            expectedUrl:
+            "https://local-testing-base-url/inApps/v1/messaging/message/a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890",
+            expectedJson: [
+                "header" => "Header text",
+                "body" => "Body text",
+                "image" => ["imageIdentifier" => "b2c3d4e5-f6a7-8901-b2c3-d4e5f6a78901", "altText" => "Alt text"],
+                "headerPosition" => "ABOVE_IMAGE",
+                "bulletPoints" => [
+                    [
+                        "text" => "Bullet 1",
+                        "imageIdentifier" => "c3d4e5f6-a7b8-9012-c3d4-e5f6a7b89012",
+                        "altText" => "Bullet alt",
+                    ]
+                ]
+            ],
+        );
+        $client->uploadMessage(
+            messageIdentifier: "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890",
+            uploadMessageRequestBody: new UploadMessageRequestBody(
+                header: "Header text",
+                body: "Body text",
+                image: new UploadMessageImage(
+                    imageIdentifier: "b2c3d4e5-f6a7-8901-b2c3-d4e5f6a78901",
+                    altText: "Alt text",
+                ),
+                headerPosition: HeaderPosition::ABOVE_IMAGE,
+                bulletPoints: [
+                    new BulletPoint(
+                        text: "Bullet 1",
+                        imageIdentifier: "c3d4e5f6-a7b8-9012-c3d4-e5f6a7b89012",
+                        altText: "Bullet alt",
+                    )
+                ]
+            )
         );
     }
 
@@ -1064,6 +1136,118 @@ class AppStoreServerAPIClientTest extends TestCase
             expectedUrl: "https://local-testing-base-url/inApps/v1/messaging/default/com.example.product/en-US",
         );
         $client->deleteDefaultMessage(productId: "com.example.product", locale: "en-US");
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testGetDefaultMessage(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/getDefaultMessageResponse.json",
+            expectedMethod: "GET",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/messaging/default/com.example.product/en-US",
+        );
+        $response = $client->getDefaultMessage("com.example.product", "en-US");
+        self::assertEquals("a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890", $response->getMessageIdentifier());
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testConfigureRealtimeUrl(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "PUT",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/messaging/realtime/url",
+            expectedJson: ["realtimeURL" => "https://example.com/realtime"],
+        );
+        $client->configureRealtimeUrl(
+            realtimeUrlRequest: new RealtimeUrlRequest(realtimeURL: "https://example.com/realtime"),
+        );
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testDeleteRealtimeUrl(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "DELETE",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/messaging/realtime/url",
+        );
+        $client->deleteRealtimeUrl();
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testGetRealtimeUrl(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/getRealtimeUrlResponse.json",
+            expectedMethod: "GET",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/messaging/realtime/url",
+        );
+        $response = $client->getRealtimeUrl();
+        self::assertEquals("https://example.com/realtime", $response->getRealtimeURL());
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testInitiatePerformanceTest(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/performanceTestResponse.json",
+            expectedMethod: "POST",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/messaging/performanceTest",
+            expectedJson: ["originalTransactionId" => "70000500092808"],
+        );
+        $response = $client->initiatePerformanceTest(
+            performanceTestRequest: new PerformanceTestRequest(originalTransactionId: "70000500092808"),
+        );
+        self::assertEquals("c4b87a1d-2e3f-4a5b-9c6d-7e8f9a0b1c2d", $response->getRequestId());
+        self::assertNotNull($config = $response->getConfig());
+        self::assertEquals(10, $config->getMaxConcurrentRequests());
+        self::assertEquals(100, $config->getTotalRequests());
+        self::assertEquals(60000, $config->getTotalDuration());
+        self::assertEquals(500, $config->getResponseTimeThreshold());
+        self::assertEquals(95, $config->getSuccessRateThreshold());
+    }
+
+    /**
+     * @throws APIException
+     */
+    public function testGetPerformanceTestResults(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/performanceTestResultResponse.json",
+            expectedMethod: "GET",
+            expectedUrl:
+            "https://local-testing-base-url/inApps/v1/messaging/performanceTest/result/c4b87a1d-2e3f-4a5b-9c6d-"
+            . "7e8f9a0b1c2d",
+        );
+        $response = $client->getPerformanceTestResults(requestId: "c4b87a1d-2e3f-4a5b-9c6d-7e8f9a0b1c2d");
+        self::assertNotNull($config = $response->getConfig());
+        self::assertEquals(10, $config->getMaxConcurrentRequests());
+        self::assertEquals(100, $config->getTotalRequests());
+        self::assertEquals(60000, $config->getTotalDuration());
+        self::assertEquals(500, $config->getResponseTimeThreshold());
+        self::assertEquals(95, $config->getSuccessRateThreshold());
+        self::assertEquals("https://example.com/retention", $response->getTarget());
+        self::assertEquals(PerformanceTestStatus::PASS, $response->getResult());
+        self::assertEquals(98, $response->getSuccessRate());
+        self::assertEquals(0, $response->getNumPending());
+        self::assertNotNull($responseTimes = $response->getResponseTimes());
+        self::assertEquals(120, $responseTimes->getAverage());
+        self::assertEquals(100, $responseTimes->getP50());
+        self::assertEquals(200, $responseTimes->getP90());
+        self::assertEquals(250, $responseTimes->getP95());
+        self::assertEquals(400, $responseTimes->getP99());
+        self::assertEquals(["TIMED_OUT" => 1, "NO_RESPONSE" => 1], $response->getFailures());
     }
 
     /**
