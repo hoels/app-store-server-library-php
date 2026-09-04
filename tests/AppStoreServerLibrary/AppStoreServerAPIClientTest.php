@@ -58,6 +58,7 @@ use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ValueError;
 
@@ -624,6 +625,70 @@ class AppStoreServerAPIClientTest extends TestCase
             self::assertEquals(429, $e->getHttpStatusCode());
             self::assertEquals(APIError::RATE_LIMIT_EXCEEDED, $e->getApiError());
             self::assertEquals("Rate limit exceeded.", $e->getErrorMessage());
+            self::assertNull($e->getRetryAfter());
+            return;
+        }
+
+        self::fail("Expected client to throw APIException.");
+    }
+
+    public function testApiTooManyRequestsWithRetryAfter(): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/apiTooManyRequestsException.json",
+            expectedMethod: "POST",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/test",
+            statusCode: 429,
+            responseHeaders: ["Retry-After" => "1698148900000"],
+        );
+
+        try {
+            $client->requestTestNotification();
+        } catch (APIException $e) {
+            self::assertEquals(429, $e->getHttpStatusCode());
+            self::assertEquals(APIError::RATE_LIMIT_EXCEEDED, $e->getApiError());
+            self::assertEquals("Rate limit exceeded.", $e->getErrorMessage());
+            self::assertEquals(1698148900000, $e->getRetryAfter());
+            self::assertEquals(["1698148900000"], $e->getHeaders()["Retry-After"]);
+            return;
+        }
+
+        self::fail("Expected client to throw APIException.");
+    }
+
+    public static function malformedRetryAfterProvider(): array
+    {
+        return [
+            [''],
+            ['not-a-number'],
+            ['1698148900000.0'],
+            ['+1698148900000'],
+            ['-1698148900000'],
+            ['1_698_148_900_000'],
+            ['1698148900000abc'],
+            ['Wed, 21 Oct 2015 07:28:00 GMT'],
+        ];
+    }
+
+    #[DataProvider("malformedRetryAfterProvider")]
+    public function testApiTooManyRequestsWithMalformedRetryAfter(string $retryAfterHeader): void
+    {
+        $client = $this->getClientWithBodyFromFile(
+            path: __DIR__ . "/resources/models/apiTooManyRequestsException.json",
+            expectedMethod: "POST",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/notifications/test",
+            statusCode: 429,
+            responseHeaders: ["Retry-After" => $retryAfterHeader],
+        );
+
+        try {
+            $client->requestTestNotification();
+        } catch (APIException $e) {
+            self::assertEquals(429, $e->getHttpStatusCode());
+            self::assertEquals(APIError::RATE_LIMIT_EXCEEDED, $e->getApiError());
+            self::assertEquals("Rate limit exceeded.", $e->getErrorMessage());
+            self::assertNull($e->getRetryAfter());
+            self::assertEquals([$retryAfterHeader], $e->getHeaders()["Retry-After"]);
             return;
         }
 
@@ -1395,6 +1460,9 @@ class AppStoreServerAPIClientTest extends TestCase
         return $signingKey;
     }
 
+    /**
+     * @param array<string, string> $responseHeaders
+     */
     private function getClientWithBody(
         string $body,
         string $expectedMethod,
@@ -1404,10 +1472,12 @@ class AppStoreServerAPIClientTest extends TestCase
         ?string $expectedBody = null,
         ?string $expectedContentType = null,
         int $statusCode = 200,
+        array $responseHeaders = [],
     ): AppStoreServerAPIClient {
+        $responseHeaders['Content-Type'] = "application/json";
         $response = new Response(
             status: $statusCode,
-            headers: ["Content-Type" => "application/json"],
+            headers: $responseHeaders,
             body: $body
         );
 
@@ -1479,6 +1549,7 @@ class AppStoreServerAPIClientTest extends TestCase
         ?string $expectedBody = null,
         ?string $expectedContentType = null,
         int $statusCode = 200,
+        array $responseHeaders = [],
     ): AppStoreServerAPIClient {
         $body = file_get_contents($path);
         return $this->getClientWithBody(
@@ -1489,7 +1560,8 @@ class AppStoreServerAPIClientTest extends TestCase
             expectedJson: $expectedJson,
             expectedBody: $expectedBody,
             expectedContentType: $expectedContentType,
-            statusCode: $statusCode
+            statusCode: $statusCode,
+            responseHeaders: $responseHeaders,
         );
     }
 }
