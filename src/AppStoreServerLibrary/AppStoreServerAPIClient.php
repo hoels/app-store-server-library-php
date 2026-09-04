@@ -159,7 +159,7 @@ class AppStoreServerAPIClient
             return is_array($responseBody) ? $responseBody : [];
         } else {
             if ($response->getHeaderLine("Content-Type") !== "application/json") {
-                throw new APIException(httpStatusCode: $response->getStatusCode());
+                throw new APIException(httpStatusCode: $response->getStatusCode(), headers: $response->getHeaders());
             }
             $responseBody = json_decode((string)$response->getBody(), true);
             $responseBody = is_array($responseBody) ? $responseBody : [];
@@ -169,7 +169,8 @@ class AppStoreServerAPIClient
             throw new APIException(
                 httpStatusCode: $response->getStatusCode(),
                 rawApiError: $rawApiError,
-                errorMessage: $errorMessage
+                errorMessage: $errorMessage,
+                headers: $response->getHeaders(),
             );
         }
     }
