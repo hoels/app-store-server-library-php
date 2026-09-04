@@ -17,6 +17,7 @@ use AppStoreServerLibrary\Models\ExtendReasonCode;
 use AppStoreServerLibrary\Models\ExtendRenewalDateRequest;
 use AppStoreServerLibrary\Models\ExternalPurchaseReport;
 use AppStoreServerLibrary\Models\ExternalPurchaseStatus;
+use AppStoreServerLibrary\Models\ImageSize;
 use AppStoreServerLibrary\Models\ImageState;
 use AppStoreServerLibrary\Models\InAppOwnershipType;
 use AppStoreServerLibrary\Models\LastTransactionsItem;
@@ -463,19 +464,6 @@ class AppStoreServerAPIClientTest extends TestCase
             ["signed_transaction_one", "signed_transaction_two"],
             $orderLookupResponse->getSignedTransactions()
         );
-    }
-
-    /**
-     * @throws APIException
-     */
-    public function testFinishTransaction(): void
-    {
-        $client = $this->getClientWithBody(
-            body: "",
-            expectedMethod: "POST",
-            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/1234/finish",
-        );
-        $client->finishTransaction(transactionId: "1234");
     }
 
     /**
@@ -935,6 +923,19 @@ class AppStoreServerAPIClientTest extends TestCase
     /**
      * @throws APIException
      */
+    public function testFinishTransaction(): void
+    {
+        $client = $this->getClientWithBody(
+            body: "",
+            expectedMethod: "POST",
+            expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/1234/finish",
+        );
+        $client->finishTransaction(transactionId: "1234");
+    }
+
+    /**
+     * @throws APIException
+     */
     public function testUploadImage(): void
     {
         $client = $this->getClientWithBody(
@@ -977,6 +978,7 @@ class AppStoreServerAPIClientTest extends TestCase
         $imageIdentifier = $response->getImageIdentifiers()[0];
         self::assertEquals("a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890", $imageIdentifier->getImageIdentifier());
         self::assertEquals(ImageState::APPROVED, $imageIdentifier->getImageState());
+        self::assertEquals(ImageSize::FULL_SIZE, $imageIdentifier->getImageSize());
     }
 
     /**

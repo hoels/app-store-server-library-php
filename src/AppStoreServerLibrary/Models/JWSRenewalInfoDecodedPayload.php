@@ -36,6 +36,8 @@ class JWSRenewalInfoDecodedPayload
         private readonly ?string $appAccountToken,
         private readonly ?string $appTransactionId,
         private readonly ?string $offerPeriod,
+        private readonly ?RenewalCommitmentInfo $commitmentInfo,
+        private readonly ?RenewalBillingPlanType $renewalBillingPlanType,
     ) {
     }
     
@@ -255,6 +257,22 @@ class JWSRenewalInfoDecodedPayload
         return $this->offerPeriod;
     }
 
+    /**
+     * https://developer.apple.com/documentation/appstoreserverapi/renewalcommitmentinfo
+     */
+    public function getCommitmentInfo(): ?RenewalCommitmentInfo
+    {
+        return $this->commitmentInfo;
+    }
+
+    /**
+     * https://developer.apple.com/documentation/appstoreserverapi/renewalbillingplantype
+     */
+    public function getRenewalBillingPlanType(): ?RenewalBillingPlanType
+    {
+        return $this->renewalBillingPlanType;
+    }
+
     public static function fromObject(stdClass $obj): JWSRenewalInfoDecodedPayload
     {
         return new JWSRenewalInfoDecodedPayload(
@@ -309,6 +327,12 @@ class JWSRenewalInfoDecodedPayload
                 ? $obj->appTransactionId : null,
             offerPeriod: property_exists($obj, "offerPeriod") && is_string($obj->offerPeriod)
                 ? $obj->offerPeriod : null,
+            commitmentInfo: property_exists($obj, "commitmentInfo")
+                && ($obj->commitmentInfo instanceof stdClass || is_array($obj->commitmentInfo))
+                ? RenewalCommitmentInfo::fromObject((object)$obj->commitmentInfo) : null,
+            renewalBillingPlanType: property_exists($obj, "renewalBillingPlanType")
+                && is_string($obj->renewalBillingPlanType)
+                ? RenewalBillingPlanType::tryFrom($obj->renewalBillingPlanType) : null,
         );
     }
 }

@@ -353,6 +353,63 @@ enum APIError: int
     case TRANSACTION_ID_IS_NOT_ORIGINAL_TRANSACTION_ID_ERROR = 4000187;
 
     /**
+     * An error the API returns that indicates the performance test request is invalid.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/invalidperformancetestrequesterror
+     */
+    case INVALID_PERFORMANCE_TEST_REQUEST = 4000211;
+
+    /**
+     * An error that indicates the request ID is invalid.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/invalidrequestiderror
+     */
+    case INVALID_REQUEST_ID = 4000212;
+
+    /**
+     * An error that indicates an error with an existing test.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/existingperformancetestrunerror
+     */
+    case EXISTING_PERFORMANCE_TEST_RUN = 4000213;
+
+    /**
+     * An error that indicates the URL is invalid.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/badrequestrealtimeurlerror
+     */
+    case BAD_REQUEST_REALTIME_URL = 4000215;
+
+    /**
+     * An error that indicates the image size provided is invalid.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/badrequestimagesizeerror
+     */
+    case BAD_REQUEST_IMAGE_SIZE = 4000216;
+
+    /**
+     * An error that indicates there are too many bullet points.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/badrequesttoomanybulletpointserror
+     */
+    case BAD_REQUEST_TOO_MANY_BULLET_POINTS = 4000218;
+
+    /**
+     * An error that indicates the text for a bullet point is too long.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/badrequestbulletpointtexttoolongerror
+     */
+    case BAD_REQUEST_BULLET_POINT_TEXT_TOO_LONG = 4000219;
+
+    /**
+     * An error that indicates that no image object is included, but the request indicates that the header should be
+     * placed above the image.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/badrequestaboveimagerequiresanimageerror
+     */
+    case BAD_REQUEST_ABOVE_IMAGE_REQUIRES_AN_IMAGE = 4000224;
+
+    /**
      * An error that indicates the subscription doesn't qualify for a renewal-date extension due to its subscription
      * state.
      *
@@ -411,6 +468,14 @@ enum APIError: int
      * https://developer.apple.com/documentation/retentionmessaging/imageinuseerror
      */
     case IMAGE_IN_USE = 4030019;
+
+    /**
+     * An error that indicates that passing a performance test is required before you can set a URL for the production
+     * environment.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/forbiddennopassingtesterror
+     */
+    case FORBIDDEN_NO_PASSING_TEST = 4030026;
 
     /**
      * An error that indicates the App Store account wasn't found.
@@ -500,11 +565,32 @@ enum APIError: int
     case MESSAGE_NOT_FOUND = 4040015;
 
     /**
+     * An error the API returns if the service can't find the specified test run.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/performancetestrunnotfounderror
+     */
+    case PERFORMANCE_TEST_RUN_NOT_FOUND = 4040018;
+
+    /**
      * An error response that indicates an app transaction doesn’t exist for the specified customer.
      *
      * https://developer.apple.com/documentation/appstoreserverapi/apptransactiondoesnotexisterror
      */
     case APP_TRANSACTION_DOES_NOT_EXIST_ERROR = 4040019;
+
+    /**
+     * An error that indicates a default message isn’t configured.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/defaultmessagenotfounderror
+     */
+    case DEFAULT_MESSAGE_NOT_FOUND = 4040020;
+
+    /**
+     * An error that indicates that the URL for your endpoint isn’t configured.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/realtimeurlnotfounderror
+     */
+    case REALTIME_URL_NOT_FOUND = 4040021;
 
     /**
      * An error that indicates the image identifier already exists.

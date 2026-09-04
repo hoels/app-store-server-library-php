@@ -3,6 +3,7 @@
 namespace AppStoreServerLibrary\Tests;
 
 use AppStoreServerLibrary\Models\AutoRenewStatus;
+use AppStoreServerLibrary\Models\BillingPlanType;
 use AppStoreServerLibrary\Models\ConsumptionRequestReason;
 use AppStoreServerLibrary\Models\Environment;
 use AppStoreServerLibrary\Models\ExpirationIntent;
@@ -12,10 +13,12 @@ use AppStoreServerLibrary\Models\OfferDiscountType;
 use AppStoreServerLibrary\Models\OfferType;
 use AppStoreServerLibrary\Models\PriceIncreaseStatus;
 use AppStoreServerLibrary\Models\PurchasePlatform;
+use AppStoreServerLibrary\Models\RenewalBillingPlanType;
 use AppStoreServerLibrary\Models\RevocationReason;
 use AppStoreServerLibrary\Models\RevocationType;
 use AppStoreServerLibrary\Models\Status;
 use AppStoreServerLibrary\Models\Subtype;
+use AppStoreServerLibrary\Models\TokenType;
 use AppStoreServerLibrary\Models\TransactionReason;
 use AppStoreServerLibrary\Models\Type;
 use AppStoreServerLibrary\SignedDataVerifier;
@@ -96,6 +99,12 @@ class SignedDataVerifierTest extends TestCase
         self::assertEquals(OfferDiscountType::PAY_AS_YOU_GO, $transaction->getOfferDiscountType());
         self::assertEquals("71134", $transaction->getAppTransactionId());
         self::assertEquals("P1Y", $transaction->getOfferPeriod());
+        self::assertEquals(BillingPlanType::MONTHLY, $transaction->getBillingPlanType());
+        self::assertNotNull($commitmentInfo = $transaction->getCommitmentInfo());
+        self::assertEquals(3, $commitmentInfo->getBillingPeriodNumber());
+        self::assertEquals(1698150000000, $commitmentInfo->getCommitmentExpiresDate());
+        self::assertEquals(119880, $commitmentInfo->getCommitmentPrice());
+        self::assertEquals(12, $commitmentInfo->getTotalBillingPeriods());
     }
 
     /**
@@ -173,6 +182,13 @@ class SignedDataVerifierTest extends TestCase
         self::assertEquals("71134", $renewalInfo->getAppTransactionId());
         self::assertEquals("P1Y", $renewalInfo->getOfferPeriod());
         self::assertEquals("7e3fb20b-4cdb-47cc-936d-99d65f608138", $renewalInfo->getAppAccountToken());
+        self::assertNotNull($commitmentInfo = $renewalInfo->getCommitmentInfo());
+        self::assertEquals("com.example.product.commitment", $commitmentInfo->getCommitmentAutoRenewProductId());
+        self::assertEquals(AutoRenewStatus::ON, $commitmentInfo->getCommitmentAutoRenewStatus());
+        self::assertEquals(RenewalBillingPlanType::MONTHLY, $commitmentInfo->getCommitmentRenewalBillingPlanType());
+        self::assertEquals(1698149500000, $commitmentInfo->getCommitmentRenewalDate());
+        self::assertEquals(9990, $commitmentInfo->getCommitmentRenewalPrice());
+        self::assertEquals(RenewalBillingPlanType::MONTHLY, $renewalInfo->getRenewalBillingPlanType());
     }
 
     /**
@@ -323,6 +339,8 @@ class SignedDataVerifierTest extends TestCase
         self::assertEquals(1698148950000, $notification->getExternalPurchaseToken()->getTokenCreationDate());
         self::assertEquals(55555, $notification->getExternalPurchaseToken()->getAppAppleId());
         self::assertEquals("com.example", $notification->getExternalPurchaseToken()->getBundleId());
+        self::assertEquals(TokenType::ACQUISITION, $notification->getExternalPurchaseToken()->getTokenType());
+        self::assertEquals(1698149000000, $notification->getExternalPurchaseToken()->getTokenExpirationDate());
     }
 
     /**

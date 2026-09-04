@@ -16,6 +16,7 @@ use AppStoreServerLibrary\Models\ExternalPurchaseReport;
 use AppStoreServerLibrary\Models\GetImageListResponse;
 use AppStoreServerLibrary\Models\GetMessageListResponse;
 use AppStoreServerLibrary\Models\HistoryResponse;
+use AppStoreServerLibrary\Models\ImageSize;
 use AppStoreServerLibrary\Models\MassExtendRenewalDateRequest;
 use AppStoreServerLibrary\Models\MassExtendRenewalDateResponse;
 use AppStoreServerLibrary\Models\MassExtendRenewalDateStatusResponse;
@@ -453,23 +454,6 @@ class AppStoreServerAPIClient
     }
 
     /**
-     * SNotifies the App Store server that your system has finished processing the customer’s transaction.
-     * https://developer.apple.com/documentation/appstoreserverapi/finish-transaction
-     *
-     * @param string $transactionId The transaction identifier of the transaction to mark as finished.
-     * @throws APIException If a response was returned indicating the request could not be processed.
-     */
-    public function finishTransaction(string $transactionId): void
-    {
-        $this->makeRequest(
-            path: "/inApps/v1/transactions/$transactionId/finish",
-            method: "POST",
-            queryParameters: [],
-            body: null
-        );
-    }
-
-    /**
      * Ask App Store Server Notifications to send a test notification to your server.
      * https://developer.apple.com/documentation/appstoreserverapi/request_a_test_notification
      *
@@ -574,19 +558,41 @@ class AppStoreServerAPIClient
     }
 
     /**
+     * Notifies the App Store server that your system has finished processing the customer’s transaction.
+     * https://developer.apple.com/documentation/appstoreserverapi/finish-transaction
+     *
+     * @param string $transactionId The transaction identifier of the transaction to mark as finished.
+     * @throws APIException If a response was returned indicating the request could not be processed.
+     */
+    public function finishTransaction(string $transactionId): void
+    {
+        $this->makeRequest(
+            path: "/inApps/v1/transactions/$transactionId/finish",
+            method: "POST",
+            queryParameters: [],
+            body: null
+        );
+    }
+
+    /**
      * Upload an image to use for retention messaging.
      * https://developer.apple.com/documentation/retentionmessaging/upload-image
      *
      * @param string $imageIdentifier A UUID you provide to uniquely identify the image you upload.
      * @param string $image The binary data of the image to upload.
+     * @param ImageSize|null $imageSize The size of the image you upload.
      * @throws APIException If a response was returned indicating the request could not be processed.
      */
-    public function uploadImage(string $imageIdentifier, string $image): void
+    public function uploadImage(string $imageIdentifier, string $image, ?ImageSize $imageSize = null): void
     {
+        $queryParameters = [];
+        if ($imageSize !== null) {
+            $queryParameters["imageSize"] = [$imageSize->value];
+        }
         $this->makeRequest(
             path: "/inApps/v1/messaging/image/$imageIdentifier",
             method: "PUT",
-            queryParameters: [],
+            queryParameters: $queryParameters,
             body: $image,
             contentType: "image/png",
         );

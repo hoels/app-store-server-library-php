@@ -14,6 +14,7 @@ class GetImageListResponseItem
     public function __construct(
         private readonly ?string $imageIdentifier,
         private readonly ?ImageState $imageState,
+        private readonly ?ImageSize $imageSize,
     ) {
     }
 
@@ -37,6 +38,16 @@ class GetImageListResponseItem
         return $this->imageState;
     }
 
+    /**
+     * The size of the image.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/imagesize
+     */
+    public function getImageSize(): ?ImageSize
+    {
+        return $this->imageSize;
+    }
+
     public static function fromObject(stdClass $obj): GetImageListResponseItem
     {
         return new GetImageListResponseItem(
@@ -44,6 +55,8 @@ class GetImageListResponseItem
                 ? $obj->imageIdentifier : null,
             imageState: property_exists($obj, "imageState") && is_string($obj->imageState)
                 ? ImageState::tryFrom($obj->imageState) : null,
+            imageSize: property_exists($obj, "imageSize") && is_string($obj->imageSize)
+                ? ImageSize::tryFrom($obj->imageSize) : null,
         );
     }
 }

@@ -14,6 +14,7 @@ class AlternateProduct implements JsonSerializable
     public function __construct(
         private readonly ?string $messageIdentifier,
         private readonly ?string $productId,
+        private readonly ?BillingPlanType $billingPlanType,
     ) {
     }
 
@@ -35,6 +36,14 @@ class AlternateProduct implements JsonSerializable
     public function getProductId(): ?string
     {
         return $this->productId;
+    }
+
+    /**
+     * https://developer.apple.com/documentation/retentionmessaging/billingplantype
+     */
+    public function getBillingPlanType(): ?BillingPlanType
+    {
+        return $this->billingPlanType;
     }
 
     /**

@@ -42,6 +42,8 @@ class JWSTransactionDecodedPayload
         private readonly ?string $offerPeriod,
         private readonly ?RevocationType $revocationType,
         private readonly ?int $revocationPercentage,
+        private readonly ?BillingPlanType $billingPlanType,
+        private readonly ?TransactionCommitmentInfo $commitmentInfo,
     ) {
     }
 
@@ -351,6 +353,22 @@ class JWSTransactionDecodedPayload
         return $this->revocationPercentage;
     }
 
+    /**
+     * https://developer.apple.com/documentation/appstoreserverapi/billingplantype
+     */
+    public function getBillingPlanType(): ?BillingPlanType
+    {
+        return $this->billingPlanType;
+    }
+
+    /**
+     * https://developer.apple.com/documentation/appstoreserverapi/transactioncommitmentinfo
+     */
+    public function getCommitmentInfo(): ?TransactionCommitmentInfo
+    {
+        return $this->commitmentInfo;
+    }
+
     public static function fromObject(stdClass $obj): JWSTransactionDecodedPayload
     {
         return new JWSTransactionDecodedPayload(
@@ -422,6 +440,11 @@ class JWSTransactionDecodedPayload
             revocationPercentage: property_exists($obj, "revocationPercentage")
                 && is_int($obj->revocationPercentage)
                 ? $obj->revocationPercentage : null,
+            billingPlanType: property_exists($obj, "billingPlanType") && is_string($obj->billingPlanType)
+                ? BillingPlanType::tryFrom($obj->billingPlanType) : null,
+            commitmentInfo: property_exists($obj, "commitmentInfo")
+                && ($obj->commitmentInfo instanceof stdClass || is_array($obj->commitmentInfo))
+                ? TransactionCommitmentInfo::fromObject((object)$obj->commitmentInfo) : null,
         );
     }
 }

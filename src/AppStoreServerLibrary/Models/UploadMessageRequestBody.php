@@ -11,10 +11,15 @@ use JsonSerializable;
  */
 class UploadMessageRequestBody implements JsonSerializable
 {
+    /**
+     * @param BulletPoint[]|null $bulletPoints
+     */
     public function __construct(
         private readonly string $header,
         private readonly string $body,
         private readonly ?UploadMessageImage $image = null,
+        private readonly ?HeaderPosition $headerPosition = null,
+        private readonly ?array $bulletPoints = null,
     ) {
     }
 
@@ -46,6 +51,28 @@ class UploadMessageRequestBody implements JsonSerializable
     public function getImage(): ?UploadMessageImage
     {
         return $this->image;
+    }
+
+    /**
+     * The position of header text, which defaults to placing header text above the body.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/headerposition
+     */
+    public function getHeaderPosition(): ?HeaderPosition
+    {
+        return $this->headerPosition;
+    }
+
+    /**
+     * An optional array of bullet points.
+     *
+     * https://developer.apple.com/documentation/retentionmessaging/bulletpoint
+     *
+     * @return BulletPoint[]|null
+     */
+    public function getBulletPoints(): ?array
+    {
+        return $this->bulletPoints;
     }
 
     /**

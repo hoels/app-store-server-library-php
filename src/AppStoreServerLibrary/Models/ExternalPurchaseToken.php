@@ -16,6 +16,8 @@ class ExternalPurchaseToken
         private readonly ?int $tokenCreationDate,
         private readonly ?int $appAppleId,
         private readonly ?string $bundleId,
+        private readonly ?TokenType $tokenType,
+        private readonly ?int $tokenExpirationDate,
     ) {
     }
 
@@ -60,6 +62,26 @@ class ExternalPurchaseToken
         return $this->bundleId;
     }
 
+    /**
+     * The type of an external purchase custom link token.
+     *
+     * https://developer.apple.com/documentation/appstoreservernotifications/tokentype
+     */
+    public function getTokenType(): ?TokenType
+    {
+        return $this->tokenType;
+    }
+
+    /**
+     * The field of a custom link token that contains the UNIX date, in milliseconds, when the token expires.
+     *
+     * https://developer.apple.com/documentation/appstoreservernotifications/tokenexpirationdate
+     */
+    public function getTokenExpirationDate(): ?int
+    {
+        return $this->tokenExpirationDate;
+    }
+
     public static function fromObject(stdClass $obj): ExternalPurchaseToken
     {
         return new ExternalPurchaseToken(
@@ -71,7 +93,12 @@ class ExternalPurchaseToken
             appAppleId: property_exists($obj, "appAppleId") && is_int($obj->appAppleId)
                 ? $obj->appAppleId : null,
             bundleId: property_exists($obj, "bundleId") && is_string($obj->bundleId)
-                ? $obj->bundleId : null
+                ? $obj->bundleId : null,
+            tokenType: property_exists($obj, "tokenType") && is_string($obj->tokenType)
+                ? TokenType::tryFrom($obj->tokenType) : null,
+            tokenExpirationDate: property_exists($obj, "tokenExpirationDate")
+                && is_int($obj->tokenExpirationDate)
+                ? $obj->tokenExpirationDate : null,
         );
     }
 }
