@@ -159,7 +159,7 @@ try {
         while ($response === null || $response->getHasMore() === true) {
             $revision = $response?->getRevision();
             $response = $client->getTransactionHistory(
-                transactionId: $transactionId,
+                anyTransactionId: $transactionId,
                 revision: $revision,
                 transactionHistoryRequest: $request
             );

@@ -152,7 +152,7 @@ class AppStoreServerAPIClientTest extends TestCase
         );
 
         $statusResponse = $client->getAllSubscriptionStatuses(
-            transactionId: "4321",
+            anyTransactionId: "4321",
             status: [Status::EXPIRED, Status::ACTIVE]
         );
 
@@ -208,7 +208,7 @@ class AppStoreServerAPIClientTest extends TestCase
         );
 
         $refundHistoryResponse = $client->getRefundHistory(
-            transactionId: "555555",
+            anyTransactionId: "555555",
             revision: "revision_input"
         );
 
@@ -364,7 +364,7 @@ class AppStoreServerAPIClientTest extends TestCase
         );
 
         $transactionHistoryResponse = $client->getTransactionHistory(
-            transactionId: "1234",
+            anyTransactionId: "1234",
             revision: "revision_input",
             transactionHistoryRequest: $transactionHistoryRequest,
             version: AppStoreServerAPIClient\GetTransactionHistoryVersion::V1
@@ -415,7 +415,7 @@ class AppStoreServerAPIClientTest extends TestCase
         );
 
         $transactionHistoryResponse = $client->getTransactionHistory(
-            transactionId: "1234",
+            anyTransactionId: "1234",
             revision: "revision_input",
             transactionHistoryRequest: $transactionHistoryRequest,
             version: AppStoreServerAPIClient\GetTransactionHistoryVersion::V2
@@ -685,7 +685,7 @@ class AppStoreServerAPIClientTest extends TestCase
         );
 
         $transactionHistoryResponse = $client->getTransactionHistory(
-            transactionId: "1234",
+            anyTransactionId: "1234",
             revision: "revision_input",
             transactionHistoryRequest: $transactionHistoryRequest
         );
@@ -727,7 +727,7 @@ class AppStoreServerAPIClientTest extends TestCase
         );
 
         $transactionHistoryResponse = $client->getTransactionHistory(
-            transactionId: "1234",
+            anyTransactionId: "1234",
             revision: "revision_input",
             transactionHistoryRequest: $transactionHistoryRequest
         );
@@ -855,7 +855,7 @@ class AppStoreServerAPIClientTest extends TestCase
             expectedUrl: "https://local-testing-base-url/inApps/v1/transactions/appTransactions/1234",
         );
 
-        $appTransactionInfoResponse = $client->getAppTransactionInfo(transactionId: "1234");
+        $appTransactionInfoResponse = $client->getAppTransactionInfo(anyTransactionId: "1234");
         self::assertNotNull($appTransactionInfoResponse);
         self::assertEquals(
             "signed_app_transaction_info_value",
@@ -873,7 +873,7 @@ class AppStoreServerAPIClientTest extends TestCase
         );
 
         try {
-            $client->getAppTransactionInfo(transactionId: "invalid_id");
+            $client->getAppTransactionInfo(anyTransactionId: "invalid_id");
         } catch (APIException $e) {
             self::assertEquals(400, $e->getHttpStatusCode());
             self::assertEquals(APIError::INVALID_TRANSACTION_ID, $e->getApiError());
@@ -894,7 +894,7 @@ class AppStoreServerAPIClientTest extends TestCase
         );
 
         try {
-            $client->getAppTransactionInfo(transactionId: "nonexistent_id");
+            $client->getAppTransactionInfo(anyTransactionId: "nonexistent_id");
         } catch (APIException $e) {
             self::assertEquals(404, $e->getHttpStatusCode());
             self::assertEquals(APIError::APP_TRANSACTION_DOES_NOT_EXIST_ERROR, $e->getApiError());
@@ -915,7 +915,7 @@ class AppStoreServerAPIClientTest extends TestCase
         );
 
         try {
-            $client->getAppTransactionInfo(transactionId: "not_found_id");
+            $client->getAppTransactionInfo(anyTransactionId: "not_found_id");
         } catch (APIException $e) {
             self::assertEquals(404, $e->getHttpStatusCode());
             self::assertEquals(APIError::TRANSACTION_ID_NOT_FOUND, $e->getApiError());

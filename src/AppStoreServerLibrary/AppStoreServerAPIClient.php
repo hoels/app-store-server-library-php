@@ -226,15 +226,15 @@ class AppStoreServerAPIClient
      * Get the statuses for all of a customer's auto-renewable subscriptions in your app.
      * https://developer.apple.com/documentation/appstoreserverapi/get_all_subscription_statuses
      *
-     * @param string $transactionId The identifier of a transaction that belongs to the customer, and which may be an
-     * original transaction identifier.
+     * @param string $anyTransactionId Any transactionId, originalTransactionId, or appTransactionId that belongs to the
+     * customer for your app.
      * @param Status[]|null $status An optional filter that indicates the status of subscriptions to include in the
      * response. Your query may specify more than one status query parameter.
      * @return StatusResponse A response that contains status information for all of a customer's auto-renewable
      * subscriptions in your app.
      * @throws APIException If a response was returned indicating the request could not be processed.
      */
-    public function getAllSubscriptionStatuses(string $transactionId, ?array $status = null): StatusResponse
+    public function getAllSubscriptionStatuses(string $anyTransactionId, ?array $status = null): StatusResponse
     {
         $queryParameters = [];
         if ($status !== null) {
@@ -242,7 +242,7 @@ class AppStoreServerAPIClient
         }
 
         $responseBody = $this->makeRequest(
-            path: "/inApps/v1/subscriptions/$transactionId",
+            path: "/inApps/v1/subscriptions/$anyTransactionId",
             method: "GET",
             queryParameters: $queryParameters,
             body: null
@@ -254,15 +254,15 @@ class AppStoreServerAPIClient
      * Get a paginated list of all of a customer's refunded in-app purchases for your app.
      * https://developer.apple.com/documentation/appstoreserverapi/get_refund_history
      *
-     * @param string $transactionId The identifier of a transaction that belongs to the customer, and which may be an
-     * original transaction identifier.
+     * @param string $anyTransactionId Any transactionId, originalTransactionId, or appTransactionId that belongs to the
+     * customer for your app.
      * @param string|null $revision A token you provide to get the next set of up to 20 transactions. All responses
      * include a revision token. Use the revision token from the previous RefundHistoryResponse.
      * @return RefundHistoryResponse A response that contains status information for all of a customer's auto-renewable
      * subscriptions in your app.
      * @throws APIException If a response was returned indicating the request could not be processed.
      */
-    public function getRefundHistory(string $transactionId, ?string $revision = null): RefundHistoryResponse
+    public function getRefundHistory(string $anyTransactionId, ?string $revision = null): RefundHistoryResponse
     {
         $queryParameters = [];
         if ($revision !== null) {
@@ -270,7 +270,7 @@ class AppStoreServerAPIClient
         }
 
         $responseBody = $this->makeRequest(
-            path: "/inApps/v2/refund/lookup/$transactionId",
+            path: "/inApps/v2/refund/lookup/$anyTransactionId",
             method: "GET",
             queryParameters: $queryParameters,
             body: null
@@ -360,8 +360,8 @@ class AppStoreServerAPIClient
      * Get a customer's in-app purchase transaction history for your app.
      * https://developer.apple.com/documentation/appstoreserverapi/get_transaction_history
      *
-     * @param string $transactionId The identifier of a transaction that belongs to the customer, and which may be an
-     * original transaction identifier.
+     * @param string $anyTransactionId Any transactionId, originalTransactionId, or appTransactionId that belongs to the
+     * customer for your app.
      * @param string|null $revision A token you provide to get the next set of up to 20 transactions. All responses
      * include a revision token. Note: For requests that use the revision token, include the same query parameters from
      * the initial request. Use the revision token from the previous HistoryResponse.
@@ -373,7 +373,7 @@ class AppStoreServerAPIClient
      * @throws APIException If a response was returned indicating the request could not be processed.
      */
     public function getTransactionHistory(
-        string $transactionId,
+        string $anyTransactionId,
         ?string $revision = null,
         ?TransactionHistoryRequest $transactionHistoryRequest = null,
         GetTransactionHistoryVersion $version = GetTransactionHistoryVersion::V1
@@ -412,7 +412,7 @@ class AppStoreServerAPIClient
         }
 
         $responseBody = $this->makeRequest(
-            path: "/inApps/{$version->value}/history/$transactionId",
+            path: "/inApps/$version->value/history/$anyTransactionId",
             method: "GET",
             queryParameters: $queryParameters,
             body: null
@@ -548,15 +548,15 @@ class AppStoreServerAPIClient
      * Get a customer's app transaction information for your app.
      * https://developer.apple.com/documentation/appstoreserverapi/get-app-transaction-info
      *
-     * @param string $transactionId Any originalTransactionId, transactionId or appTransactionId that belongs to the
+     * @param string $anyTransactionId Any transactionId, originalTransactionId, or appTransactionId that belongs to the
      * customer for your app.
      * @return AppTransactionInfoResponse A response that contains signed app transaction information for a customer.
      * @throws APIException If a response was returned indicating the request could not be processed.
      */
-    public function getAppTransactionInfo(string $transactionId): AppTransactionInfoResponse
+    public function getAppTransactionInfo(string $anyTransactionId): AppTransactionInfoResponse
     {
         $responseBody = $this->makeRequest(
-            path: "/inApps/v1/transactions/appTransactions/$transactionId",
+            path: "/inApps/v1/transactions/appTransactions/$anyTransactionId",
             method: "GET",
             queryParameters: [],
             body: null
